@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+{% load crispy_forms_tags %}
+{% load static %}
 <html>
 <head>
   <title>Profile Edit</title>
@@ -6,359 +8,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
-  <script src=  
-    "https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">  
-  </script>  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>  
     
-  <script src=  
-  "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">  
-  </script>  
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/ui-lightness/jquery-ui.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+
   {{ OAuth|json_script:"auths" }} 
   <script>
     const auths = JSON.parse(document.getElementById('auths').textContent);
   </script>
 
+  <script src="{% static 'application/autocomplete.js' %}"></script>
+
   <script>
-    $( function() {
-
-      $( "#id_song1_name_artist" ).autocomplete({
-        source: getSongList,
-        select: saveTrkOnClick1,
-        change: selectOnly,
-      });
-
-       $( "#id_song2_name_artist" ).autocomplete({
-        source: getSongList,
-        select: saveTrkOnClick2,
-        change: selectOnly,
-      });
-
-       $( "#id_song3_name_artist" ).autocomplete({
-        source: getSongList,
-        select: saveTrkOnClick3,
-        change: selectOnly,
-      });
-       $( "#id_song4_name_artist" ).autocomplete({
-        source: getSongList,
-        select: saveTrkOnClick4,
-        change: selectOnly,
-      });
-       $( "#id_song5_name_artist" ).autocomplete({
-        source: getSongList,
-        select: saveTrkOnClick5,
-        change: selectOnly,
-      });
-
-       $( "#id_album1_name_artist" ).autocomplete({
-        source: getAlbumList,
-        select: saveAlbOnClick1,
-        change: selectOnly,
-      });
-
-      $( "#id_album2_name_artist" ).autocomplete({
-        source: getAlbumList,
-        select: saveAlbOnClick2,
-        change: selectOnly,
-      });
-
-      $( "#id_album3_name_artist" ).autocomplete({
-        source: getAlbumList,
-        select: saveAlbOnClick3,
-        change: selectOnly,
-      });
-
-      $( "#id_album4_name_artist" ).autocomplete({
-        source: getAlbumList,
-        select: saveAlbOnClick4,
-        change: selectOnly,
-      });
-
-      $( "#id_album5_name_artist" ).autocomplete({
-        source: getAlbumList,
-        select: saveAlbOnClick5,
-        change: selectOnly,
-      });
-
-
-      $( "#id_artist1_name" ).autocomplete({
-        source: getArtistList,
-        select: saveArtOnClick1,
-        change: selectOnly,
-      });
-
-      $( "#id_artist2_name" ).autocomplete({
-        source: getArtistList,
-        select: saveArtOnClick2,
-        change: selectOnly,
-      });
-
-      $( "#id_artist3_name" ).autocomplete({
-        source: getArtistList,
-        select: saveArtOnClick3,
-        change: selectOnly,
-      });
-
-      $( "#id_artist4_name" ).autocomplete({
-        source: getArtistList,
-        select: saveArtOnClick4,
-        change: selectOnly,
-      });
-
-      $( "#id_artist5_name" ).autocomplete({
-        source: getArtistList,
-        select: saveArtOnClick5,
-        change: selectOnly,
-      });
-
-
-      $( "#id_genre1" ).autocomplete({
-        source: getGenreList,
-      });
-
-      $( "#id_genre2" ).autocomplete({
-        source: getGenreList,
-      });
-
-      $( "#id_genre3" ).autocomplete({
-        source: getGenreList,
-      });
-
-      $( "#id_genre4" ).autocomplete({
-        source: getGenreList,
-      });
-
-      $( "#id_genre5" ).autocomplete({
-        source: getGenreList,
-      });
-
-      $( "#id_response1" ).autocomplete({
-        source: getSongList,
-        select: saveResponseOnClick1,
-        change: selectOnly,
-      });
-
-       $( "#id_response2" ).autocomplete({
-        source: getSongList,
-        select: saveResponseOnClick2,
-        change: selectOnly,
-      });
-
-       $( "#id_response3" ).autocomplete({
-        source: getSongList,
-        select: saveResponseOnClick3,
-        change: selectOnly,
-      });
-       $( "#id_response4" ).autocomplete({
-        source: getSongList,
-        select: saveResponseOnClick4,
-        change: selectOnly,
-      });
-       $( "#id_response5" ).autocomplete({
-        source: getSongList,
-        select: saveResponseOnClick5,
-        change: selectOnly,
-      });
-
-      accessToken = auths;
-      function selectOnly(event, ui) { if (!ui.item) { $(this).val(''); } };
-      function getSongList(request, response) {
-        var songSearch = request.term;
-        var songList = [];
-        $.ajax({
-          url: "https://api.spotify.com/v1/search?q=" + songSearch + "&type=track&limit=25",
-          method: "GET",
-          dataType: "json",
-          headers: {
-              "Authorization" : " Bearer " + accessToken
-          },
-          success: function(data) {
-              var artistData;
-              var songStr;
-              var songID;
-              var ary = data.tracks.items;
-              for (track in ary) {
-                  songStr = ary[track].name + " - ";
-                  artistData = ary[track].artists;
-                  for (artist in artistData) {
-                      songStr = songStr + artistData[artist].name + ", ";
-                  }
-                  songID = ary[track].id;
-                  songList.push({label: songStr.slice(0,-2), value: songID});
-              }
-              response(songList);
-          },
-        })
-      };
-      function saveTrkOnClick1(event, ui) {
-          event.preventDefault();
-          $("#id_song1_id").val(ui.item.value);
-          $("#id_song1_name_artist").val(ui.item.label);
-
-          <!-- var test1 = $("#songID1").val(); -->
-      };
-      function saveTrkOnClick2(event, ui) {
-          event.preventDefault();
-          $("#id_song2_id").val(ui.item.value);
-          $("#id_song2_name_artist").val(ui.item.label);
-
-      };
-      function saveTrkOnClick3(event, ui) {
-          event.preventDefault();
-          $("#id_song3_id").val(ui.item.value);
-          $("#id_song3_name_artist").val(ui.item.label);
-
-      };
-      function saveTrkOnClick4(event, ui) {
-          event.preventDefault();
-          $("#id_song4_id").val(ui.item.value);
-          $("#id_song4_name_artist").val(ui.item.label);
-
-      };
-      function saveTrkOnClick5(event, ui) {
-          event.preventDefault();
-          $("#id_song5_id").val(ui.item.value);
-          $("#id_song5_name_artist").val(ui.item.label);
-
-      };
-
-      function getAlbumList(request, response) {
-        var albumSearch = request.term;
-        var albumList = [];
-        $.ajax({
-          url: "https://api.spotify.com/v1/search?q=" + albumSearch + "&type=album&limit=25",
-          method: "GET",
-          dataType: "json",
-          headers: {
-              "Authorization" : " Bearer " + accessToken
-          },
-          success: function(data) {
-              var artistData;
-              var albumStr;
-              var albumID;
-              var ary = data.albums.items;
-              for (album in ary) {
-                  albumStr = ary[album].name + " - ";
-                  artistData = ary[album].artists;
-                  for (artist in artistData) {
-                      albumStr = albumStr + artistData[artist].name + ", ";
-                  }
-                  albumID = ary[album].id;
-                  albumList.push({label: albumStr.slice(0,-2), value: albumID});
-              }
-              response(albumList);
-          },
-        })
-      };
-      function saveAlbOnClick1(event, ui) {
-        event.preventDefault();
-        $("#id_album1_id").val(ui.item.value);
-        $("#id_album1_name_artist").val(ui.item.label);
-
-      };
-      function saveAlbOnClick2(event, ui) {
-        event.preventDefault();
-        $("#id_album2_id").val(ui.item.value);
-        $("#id_album2_name_artist").val(ui.item.label);
-
-      };
-      function saveAlbOnClick3(event, ui) {
-        event.preventDefault();
-        $("#id_album3_id").val(ui.item.value);
-        $("#id_album3_name_artist").val(ui.item.label);
-
-      };
-      function saveAlbOnClick4(event, ui) {
-        event.preventDefault();
-        $("#id_album4_id").val(ui.item.value);
-        $("#id_album4_name_artist").val(ui.item.label);
-
-      };
-      function saveAlbOnClick5(event, ui) {
-        event.preventDefault();
-        $("#id_album5_id").val(ui.item.value);
-        $("#id_album5_name_artist").val(ui.item.label);
-
-      };
-
-      function getArtistList(request, response) {
-        var artistSearch = request.term;
-        var artistList = [];
-        $.ajax({
-          url: "https://api.spotify.com/v1/search?q=" + artistSearch + "&type=artist&limit=25",
-          method: "GET",
-          dataType: "json",
-          headers: {
-              "Authorization" : " Bearer " + accessToken
-          },
-          success: function(data) {
-              var ary = data.artists.items;
-              for (artist in ary) {
-                  songID = ary[artist].id;
-                  artistList.push({label: ary[artist].name, value: ary[artist].id});
-              }
-              response(artistList);
-          },
-        })
-      };
-      function saveArtOnClick1(event, ui) {
-        event.preventDefault();
-        $("#id_artist1_id").val(ui.item.value);
-        $("#id_artist1_name").val(ui.item.label);
-
-      };
-      function saveArtOnClick2(event, ui) {
-        event.preventDefault();
-        $("#id_artist2_id").val(ui.item.value);
-        $("#id_artist2_name").val(ui.item.label);
-
-      };
-      function saveArtOnClick3(event, ui) {
-        event.preventDefault();
-        $("#id_artist3_id").val(ui.item.value);
-        $("#id_artist3_name").val(ui.item.label);
-
-      };
-      function saveArtOnClick4(event, ui) {
-        event.preventDefault();
-        $("#id_artist4_id").val(ui.item.value);
-        $("#id_artist4_name").val(ui.item.label);
-
-      };
-      function saveArtOnClick5(event, ui) {
-        event.preventDefault();
-        $("#id_artist5_id").val(ui.item.value);
-        $("#id_artist5_name").val(ui.item.label);
-
-      };
-
-      function saveResponseOnClick1(event, ui) {
-        event.preventDefault();
-        $("#id_response1").val(ui.item.label);
-
-      };
-
-      function saveResponseOnClick2(event, ui) {
-        event.preventDefault();
-        $("#id_response2").val(ui.item.label);
-
-      };
-      function saveResponseOnClick3(event, ui) {
-        event.preventDefault();
-        $("#id_response3").val(ui.item.label);
-
-      };
-      function saveResponseOnClick4(event, ui) {
-        event.preventDefault();
-        $("#id_response4").val(ui.item.label);
-
-      };
-      function saveResponseOnClick5(event, ui) {
-        event.preventDefault();
-        $("#id_response5").val(ui.item.label);
-
-      };
-
-      function getGenreList(request, response) {
+    function getGenreList(request, response) {
         var genreArray = [
           {% for genre in genre_list %}
             "{{genre.genre_name}}",
@@ -370,66 +33,81 @@
         var results = $.ui.autocomplete.filter(genreArray, request.term);
 
         response(results.slice(0, 25));
-      };});
+      };
   </script>
 
-  <style>
+  <script>
+  $( function() {
+    $( "#tabs" ).tabs();
+  } );
+  </script>
+
+  <style>  
+    .edit_tabs {
+      background: linear-gradient(to bottom, #496067 0%, #e2b7cd 100%)
+    }  
     body {
       background: linear-gradient(to bottom, #496067 0%, #e2b7cd 100%);
-    }    
+    }
+
   </style>
-
-  <link href=
-  "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css"
-        rel="stylesheet" type="text/css" />
-
 
 </head>
 <body>
 
 
-  {% load crispy_forms_tags %}
   <div class="container">
-    <div class="form-group row"> <div class="aab col-0.2"></div> <div class="col-lg"> 
-      <input type="button" name="submit" style ="margin-top: 15px;" onclick="location.href = '/application/profile'" value="Return to Profile" class="btn btn-primary" id="submit-id-submit"> </div> </div>
-    
-    {% crispy song_form %}
-    <style>
-      .asteriskField {display: none;};
-      .form-group {margin-bottom: 0.5rem};
+    <div id="tabs" class ="edit_tabs">
+      <ul>
+        <li><a href="#tabs-1">Nunc tincidunt</a></li>
+        <li><a href="#tabs-2">Proin dolor</a></li>
+        <li><a href="#tabs-3">Aenean lacinia</a></li>
+      </ul>
+      <div id="tabs-1">
+        <div class="form-group row"> <div class="aab col-0.2"></div> <div class="col-lg"> 
+          <input type="button" name="submit" style ="margin-top: 15px;" onclick="location.href = '/application/profile'" value="Return to Profile" class="btn btn-primary" id="submit-id-submit"> </div> </div>
+        
+        {% crispy song_form %}
+        <style>
+          .asteriskField {display: none;};
+          .form-group {margin-bottom: 0.5rem};
 
-    </style>
+        </style>
 
-    {% crispy album_form %}
-    <style>
-      .asteriskField {display: none;};
-      .form-group {margin-bottom: 0.5rem};
-    </style>
+        {% crispy album_form %}
+        <style>
+          .asteriskField {display: none;};
+          .form-group {margin-bottom: 0.5rem};
+        </style>
 
-        {% crispy artist_form %}
-    <style>
-      .asteriskField {display: none;}
-      .form-group {margin-bottom: 0.5rem};
+            {% crispy artist_form %}
+        <style>
+          .asteriskField {display: none;}
+          .form-group {margin-bottom: 0.5rem};
 
-    </style>
+        </style>
 
-    {% crispy genre_form %}
+        {% crispy genre_form %}
 
-    <style>
-      .asteriskField {display: none;}
-      .form-group {margin-bottom: 0.5rem};
+        <style>
+          .asteriskField {display: none;}
+          .form-group {margin-bottom: 0.5rem};
 
-    </style>
+        </style>
 
-    {% crispy prompt_form %}
+        {% crispy prompt_form %}
 
-    <style>
-      .asteriskField {display: none;}
-      .form-group {margin-bottom: 0.5rem};
+        <style>
+          .asteriskField {display: none;}
+          .form-group {margin-bottom: 0.5rem};
 
-    </style>
+        </style>
+      </div>
 
+      <div id="tabs-2">account management</div>
+      <div id="tabs-3"> idk lol</div>
     </div>
+  </div>
 
 </body>
 </html>
