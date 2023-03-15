@@ -85,10 +85,11 @@ def register_request(request):
     else:
         form = NewUserForm()
 
+    context = {}
+    context["form"] = form
+    context["loginUrl"] = reverse("login")
     return render(
-        request=request,
-        template_name="registration/register.html",
-        context={"form": form},
+        request=request, template_name="registration/register.html", context=context
     )
 
 
@@ -105,9 +106,10 @@ def login_view(request):
                 return redirect(reverse("profile"))
     else:
         form = AuthenticationForm()
-    return render(request, "registration/login.html", {"form": form})
+        context = {"form": form}
+    return render(request, "registration/login.html", context)
 
 
 def logout_view(request):
     logout(request)
-    return redirect(reverse("login"))
+    return redirect("/")
