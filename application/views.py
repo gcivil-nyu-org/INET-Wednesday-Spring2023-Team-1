@@ -355,3 +355,33 @@ def profile(request):
         {"first_name": curr_user.first_name, "last_name": curr_user.last_name}
     )
     return render(request, "application/profile.html", context)
+
+
+@login_required
+def discover(request):
+    spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
+
+    curr_user = request.user
+
+    (
+        initial_songs,
+        initial_artists,
+        initial_albums,
+        initial_genres,
+        initial_prompts,
+        artist_art,
+        album_art,
+    ) = get_favorite_data(curr_user, spotify, True)
+
+    context = {}
+    context.update(initial_songs)
+    context.update(initial_artists)
+    context.update(initial_albums)
+    context.update(initial_genres)
+    context.update(initial_prompts)
+    context.update(artist_art)
+    context.update(album_art)
+    context.update(
+        {"first_name": curr_user.first_name, "last_name": curr_user.last_name}
+    )
+    return render(request, "application/discover.html", context)
