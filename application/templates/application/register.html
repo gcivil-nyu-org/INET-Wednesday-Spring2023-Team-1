@@ -1,19 +1,55 @@
 <!DOCTYPE html>
+{% load static %}
 {% load crispy_forms_tags %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Register</title>
+	<link rel="stylesheet" type="text/css" href="{% static '../static/admin/css/register_style.css' %}">
 </head>
+
+
 <body>
-<div class="container py-5">
-	<h1>Register</h1>
+<div class="registerBox">
+	<h2>Create Account</h2>
 	<form method="POST">
 		{% csrf_token %}
-		{{ form|crispy }}
-		<button class="btn btn-primary" type="submit">Register</button>
+		<!--{{form.username.label}}
+		{{form.username}}-->
+		<div class="usern">
+			<h4> Username</h4>
+			{{form.username}}
+		</div>
+		<div class="email"> 
+			<h4> Email </h4>
+			{{form.email}} 
+		</div>
+		<div class="password1">
+			<h4> Password </h4>
+			{{form.password1}}
+			<div class="paragraph">
+				<p> Use 8 or more characters. Letters, digits, and @/./+/-/_ only </p>
+			</div>
+		
+		</div>	
+		<div class="password2">
+			<h4> Confirm Password </h4>
+			{{form.password2}}
+		</div>
+		<div class = "regButton">
+			<button class="btn btn-primary" type="submit">Register</button>
+		</div>
+		
 	</form>
-	<p class="text-center">If you already have an account, <a href="/login">login</a> instead.</p>
+	<div class = "rightBox">
+		<h1> Register For <br/> NYU BeatBuddies</h1>
+		<h4> Already have an account? </h4>
+		<div class = "loginButton">
+		  <form action = "/application/login">
+			<button type="submit" class="button">Login</button>
+		  </form>
+		</div>
+	</div>
 </div>
 </body>
 </html>

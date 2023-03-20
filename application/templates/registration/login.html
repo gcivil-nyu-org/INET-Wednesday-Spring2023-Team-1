@@ -1,6 +1,55 @@
-<h2>Log In</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Log In</button>
-</form>
+<!DOCTYPE html>
+{% load static %}
+{% load crispy_forms_tags %}
+
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+    <link rel="stylesheet" type="text/css" href="{% static '../static/admin/css/login_style.css' %}">
+
+  </head>
+
+
+<body>
+
+  <div class = "loginBox">
+    <h2>Sign In </h2>
+    <p> <br/> </p>
+    <div class = "loginLine"> </div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="usern">
+        <h4> Username</h4>
+        {{form.username}}
+        
+      </div>
+      <div class="password">
+        <h4> Password</h4>
+        {{form.password}}
+      </div>
+      <div class="forgot_password">
+        <button onclick = "">Forgot Password?</button>
+      </div>
+      <div class = "button1">
+        <button onclick = "">Sign In</button>
+      </div>
+    </form>
+    <div class = "rightBox">
+      <h1> Welcome To <br/> NYU BeatBuddies</h1>
+      <h4> Don't have an account? </h4>
+      <div class = "button2">
+        <form action = "/application/register">
+          <button type="submit" class="button">Sign Up</button>
+        </form>
+      </div>
+  
+  
+  
+    </div>
+  </div>
+
+  
+
+</body>
+</html>

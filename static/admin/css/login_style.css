@@ -1,0 +1,126 @@
+body{
+
+    margin:0;
+    padding:0;
+    font-family: Arial, Helvetica, sans-serif;
+    /* background: linear-gradient(120deg, #33ccff, #ff99cc); */
+    background-image: url("https://c4.wallpaperflare.com/wallpaper/3/259/587/sound-wave-simple-background-digital-art-wallpaper-thumb.jpg");
+    background-size: cover;
+    height: 100vh;
+    overflow: hidden;
+
+}
+
+.loginBox{
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px;
+    height: 450px;
+    background: linear-gradient(90deg, white 50%, #ae92b7 50%);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.loginBox h2 {
+    position: relative;
+    left: 50px;
+    bottom: -30px;
+    padding: 0 0 20px 0;
+}
+
+.loginBox form {
+    padding: 0 40px;
+    box-sizing: border-box;
+}
+
+/* form .usern_passw {
+    position: relative;
+    border-bottom: 2px solid #adadad;
+    margin: 0px 0;
+} */
+
+/* .usern_passw h4 {
+    width: 100%;
+    height: 45px;
+    position: relative;
+    bottom: 20%;
+    padding: 0 5px;
+    font-size: 16px;
+} */
+
+.usern h4{
+    width: 100%;
+    height: 5px;
+    position: relative;
+    bottom: 10%;
+    /* padding: 0 5px; */
+    font-size: 14px;
+}
+
+.password h4{
+    width: 100%;
+    height: 5px;
+    position: relative;
+    bottom: 10%;
+    /* padding: 0 5px; */
+    font-size: 14px;
+}
+
+.forgot_password button{
+    padding: 0;
+    border: none;
+    background: none;
+    position: absolute;
+    bottom: 45%;
+    color: #ae92b7;
+    text-decoration-line: underline;  
+}
+
+.button1 button {
+    width: 40%;
+    height: 45px;
+    position: absolute;
+    bottom: 20%;
+    padding: 0 5px;
+    font-size: 16px;
+    border-radius: 25px;
+    background-color: #ae92b7;
+    color: white;
+    border-color: #ae92b7;
+}
+
+.rightBox h1 {
+    position: relative;
+    left: 25%;
+    bottom: 110px;
+    text-align: center;
+    color: white;
+    
+}
+.rightBox h4{
+    position: relative;
+    left: 25%;
+    bottom: 110px;
+    text-align: center;
+    color: white;
+    font-weight: normal;
+}
+
+.button2 button {
+    position: relative;
+    left: 70%;
+    bottom: 120px;
+    text-align: center;
+    padding: 0 10px;
+    width: 15%;
+    height: 35px;
+    border-radius: 25px;
+    background-color: transparent;
+    color: white;
+    border-color: white;
+    border-style: solid;
+
+}
+
