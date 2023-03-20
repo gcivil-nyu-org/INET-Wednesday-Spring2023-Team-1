@@ -15,11 +15,8 @@ from django.contrib.auth.models import User
 
 
 class NewUserForm(UserCreationForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username', 'background-color': 'red'}))
-    email = forms.EmailField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Email'}))
-    password1 = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Password'}))
-    password2 = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Confirm Password'}))
-    
+    email = forms.EmailField(required=True)
+
     class Meta:
         model = User
         fields = ("username", "email", "password1", "password2")
