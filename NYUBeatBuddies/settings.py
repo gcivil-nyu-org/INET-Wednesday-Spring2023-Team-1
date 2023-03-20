@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 from pathlib import Path
 from dotenv import load_dotenv
-import sys
+
+# import sys
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,7 +26,7 @@ load_dotenv(dotenv_path)
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY", "")
+SECRET_KEY = os.environ["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,6 +38,7 @@ ALLOWED_HOSTS = [
     "www.nyubeatbuddies.com",
     "nyubeatbuddies-env.eba-vkfe3kpa.us-west-2.elasticbeanstalk.com",
     "dev.nyubeatbuddies.com",
+    "development-nbb.us-west-2.elasticbeanstalk.com",
 ]
 
 # Application definition
@@ -44,6 +46,7 @@ ALLOWED_HOSTS = [
 INSTALLED_APPS = [
     "spotipy",
     "application",
+    "account",
     "crispy_forms",
     "crispy_bootstrap4",
     "django.contrib.admin",
@@ -94,16 +97,15 @@ DATABASES = {
     }
 }
 
-if os.environ.get("DATABASE_NAME", None) is not None and "test" not in sys.argv:
-    DATABASES["default"] = {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.environ.get("DATABASE_NAME", ""),
-        "USER": os.environ.get("DATABASE_USER", ""),
-        "PASSWORD": os.environ.get("DATABASE_PASSWORD", ""),
-        "HOST": os.environ.get("DATABASE_HOST", ""),
-        "PORT": "5432",
-        "TEST": {"NAME": os.environ.get("DATABASE_NAME")},
-    }
+# if os.environ.get("DATABASE_NAME", None):  # is not None and "test" not in sys.argv:
+#    DATABASES["default"] = {
+#        "ENGINE": "django.db.backends.postgresql_psycopg2",
+#        "NAME": os.environ.get("DATABASE_NAME", ""),
+#        "USER": os.environ.get("DATABASE_USER", ""),
+#        "PASSWORD": os.environ.get("DATABASE_PASSWORD", ""),
+#        "HOST": os.environ.get("DATABASE_HOST", ""),
+#        "PORT": "5432",
+#    }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -141,8 +143,8 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 # STATIC_ROOT is for collectstatic
-# STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATICFILES_DIRS = ('static',)
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+# STATICFILES_DIRS = ("static",)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -153,8 +155,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # login URL
-LOGIN_URL = "/application/login"
-LOGIN_REDIRECT_URL = "profile"
+LOGIN_URL = "/account/login"
+# LOGIN_REDIRECT_URL = "profile"
 
 # email settings
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

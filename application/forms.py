@@ -1,5 +1,7 @@
 from django import forms
 from django.forms import ModelForm
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserChangeForm
 from .models import (
     FavoriteSong,
     FavoriteArtist,
@@ -11,7 +13,6 @@ from .models import PromptList
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Fieldset, Field, Div
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
 
 
 class NewUserForm(UserCreationForm):
@@ -372,4 +373,84 @@ class PromptEdit(ModelForm):
             "response3",
             "response4",
             "response5",
+        )
+
+
+class AccountSettingsForm(UserChangeForm):
+    password = None
+
+    def __init__(self, *args, **kwargs):
+        super(AccountSettingsForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.add_input(Submit("submit", "Save"))
+
+        self.helper.layout = Layout(
+            Div(
+                Fieldset("First Name"),
+                Div(
+                    Field(
+                        "first_name",
+                        placeholder="John",
+                        label="dfsf",
+                        css_class="form-group form-control-lg",
+                    ),
+                    css_class="col",
+                ),
+                Fieldset("Last Name"),
+                Div(
+                    Field(
+                        "last_name",
+                        placeholder="Doe",
+                        css_class="form-group form-control-lg",
+                    ),
+                    css_class="col",
+                ),
+                Fieldset("Email"),
+                Div(
+                    Field(
+                        "email",
+                        placeholder="johndoe@email.com",
+                        css_class="form-group form-control-lg",
+                    ),
+                    css_class="col",
+                ),
+                Fieldset("Current Password"),
+                Div(
+                    Field(
+                        "password",
+                        placeholder="Current Password",
+                        css_class="form-group form-control-lg",
+                    ),
+                    css_class="col",
+                ),
+                Fieldset("New Password"),
+                Div(
+                    Field(
+                        "password",
+                        placeholder="New Password",
+                        css_class="form-group form-control-lg",
+                    ),
+                    css_class="col",
+                ),
+                Fieldset("Confirm New Password"),
+                Div(
+                    Field(
+                        "password",
+                        placeholder="Confirm New Password",
+                        css_class="form-group form-control-lg",
+                    ),
+                    css_class="col",
+                ),
+                css_class="form-col",
+            ),
+        )
+        self.helper.form_show_labels = False
+
+    class Meta:
+        model = User
+        fields = (
+            "first_name",
+            "last_name",
+            "email",
+            "password",
         )

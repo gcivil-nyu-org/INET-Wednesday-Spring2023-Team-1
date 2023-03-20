@@ -1,3 +1,4 @@
+<<<<<<< HEAD:application/templates/registration/login.html
 <!DOCTYPE html>
 {% load static %}
 {% load crispy_forms_tags %}
@@ -53,3 +54,12 @@
 
 </body>
 </html>
+=======
+<h2>Log In</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Log In</button>
+  <p>Don't have an account? <a href="{% url 'account:register' %}">Register now</a></p>
+</form>
+>>>>>>> c9efa959d3b43d3daf52cdf7d213b2630e1ed24b:account/templates/registration/login.html

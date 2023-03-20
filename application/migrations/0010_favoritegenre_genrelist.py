@@ -5,6 +5,7 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
+    atomic = False
     dependencies = [
         ("application", "0009_alter_favoritealbum_user_alter_favoriteartist_user"),
     ]

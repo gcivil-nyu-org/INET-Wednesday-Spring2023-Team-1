@@ -59,9 +59,8 @@
   <div class="container">
     <div id="tabs" class ="edit_tabs">
       <ul>
-        <li><a href="#tabs-1">Nunc tincidunt</a></li>
-        <li><a href="#tabs-2">Proin dolor</a></li>
-        <li><a href="#tabs-3">Aenean lacinia</a></li>
+        <li><a href="#tabs-1">Profile Edit</a></li>
+        <li><a href="#tabs-2">Account Settings</a></li>
       </ul>
       <div id="tabs-1">
         <div class="form-group row"> <div class="aab col-0.2"></div> <div class="col-lg"> 
@@ -104,8 +103,18 @@
         </style>
       </div>
 
-      <div id="tabs-2">account management</div>
-      <div id="tabs-3"> idk lol</div>
+      <div id="tabs-2">
+        <div class="form-group row"> <div class="aab col-0.2"></div> <div class="col-lg"> 
+          <input type="button" name="submit" style ="margin-top: 15px;" onclick="location.href = '/application/profile'" value="Return to Profile" class="btn btn-primary" id="submit-id-submit"> </div> </div>
+        
+        {% crispy account_edit %}
+        <style>
+          .asteriskField {display: none;};
+          .form-group {margin-bottom: 0.5rem};
+
+        </style>
+
+      </div>
     </div>
   </div>
 

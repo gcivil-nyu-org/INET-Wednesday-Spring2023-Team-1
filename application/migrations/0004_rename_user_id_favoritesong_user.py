@@ -4,6 +4,7 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
+    atomic = False
     dependencies = [
         ("application", "0003_favoritealbum_favoriteartist_favoritesong_and_more"),
     ]
