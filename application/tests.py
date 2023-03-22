@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 
+from .models import FavoriteSong
 import os
 
 # from bs4 import BeautifulSoup
@@ -32,6 +33,7 @@ class HomeTestCase(TestCase):
 
     def test_account_login_page_exists(self):
         response = self.client.get("/account/login")
+        self.assertContains(response, "Username")
         self.assertEqual(response.status_code, 200)
 
     # def test_account_login_page_exists(self):
@@ -64,4 +66,6 @@ class HomeTestCase(TestCase):
     #     soup = BeautifulSoup(response.content, "html.parser")
     #     button = soup.select_one('button')
     #     self.assertIsNotNone(button)
-    #     # self.assertEqual(button.text, "Discover People")
+    #     self.assertEqual(button.text, "Discover People")
+
+   
