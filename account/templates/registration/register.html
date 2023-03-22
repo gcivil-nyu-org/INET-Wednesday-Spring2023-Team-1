@@ -1,19 +1,202 @@
 <!DOCTYPE html>
+{% load static %}
 {% load crispy_forms_tags %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Register</title>
+	<!-- <link rel="stylesheet" type="text/css" href="{% static '../static/admin/css/register_style.css' %}"> -->
+	<style>
+		body{
+
+		margin:0;
+		padding:0;
+		font-family: Arial, Helvetica, sans-serif;
+		/* background: linear-gradient(120deg, #33ccff, #ff99cc); */
+		background-image: url("https://c4.wallpaperflare.com/wallpaper/3/259/587/sound-wave-simple-background-digital-art-wallpaper-thumb.jpg");
+		background-size: cover;
+		height: 100vh;
+		overflow: hidden;
+
+		}
+
+		.registerBox{
+		position: relative;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 800px;
+		height: 450px;
+		background: linear-gradient(90deg, white 50%, #ae92b7 50%);
+		border-radius: 10px;
+		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+		}
+
+		.registerBox h2 {
+		position: relative;
+		left: 50px;
+		bottom: -30px;
+		padding: 0 0 30px 0;
+		}
+
+		.registerBox form {
+		padding: 0 40px;
+		box-sizing: border-box;
+		}
+
+		/* .usern_email_passw h4 {
+		width: 100%;
+		height: 40px;
+		position: relative;
+		bottom: 20%;
+		/* padding: 0 5px; */
+		/* font-size: 12px; */
+		/* } */ 
+
+		.usern h4{
+		width: 100%;
+		height: 5px;
+		position: relative;
+		bottom: 10%;
+		/* padding: 0 5px; */
+		font-size: 14px;
+		}
+
+		.email h4{
+		width: 100%;
+		height: 5px;
+		position: relative;
+		bottom: 10%;
+		/* padding: 0 5px; */
+		font-size: 14px;
+		}
+
+		.password1 h4{
+		width: 100%;
+		height: 5px;
+		position: relative;
+		bottom: 10%;
+		/* padding: 0 5px; */
+		font-size: 14px;
+		}
+
+		.paragraph{
+		color: grey;
+		font-size: 10px;
+		}
+
+		.password2 h4{
+		width: 100%;
+		height: 5px;
+		position: relative;
+		bottom: 0%;
+		/* padding: 0 5px; */
+		font-size: 14px;
+		}
+
+		.regButton button {
+		width: 40%;
+		height: 45px;
+		position: absolute;
+		bottom: 10%;
+		padding: 0 5px;
+		font-size: 16px;
+		border-radius: 25px;
+		background-color: #ae92b7;
+		color: white;
+		border-color: #ae92b7;
+		cursor: pointer;
+		}
+
+		.regButton:hover {
+			background-color: purple;
+		}
+
+		.rightBox h1 {
+		position: relative;
+		left: 25%;
+		bottom: 230px;
+		text-align: center;
+		color: white;
+
+		}
+		.rightBox h4{
+		position: relative;
+		left: 25%;
+		bottom: 230px;
+		text-align: center;
+		color: white;
+		font-weight: normal;
+		}
+
+		.loginButton button {
+		position: relative;
+		left: 71%;
+		bottom: 235px;
+		text-align: center;
+		padding: 0 10px;
+		width: 15%;
+		height: 35px;
+		border-radius: 25px;
+		background-color: transparent;
+		color: white;
+		border-color: white;
+		border-style: solid;
+		cursor: pointer;
+
+		}
+
+		button:hover {
+			background-color: purple;
+			border-style: solid;
+		}
+
+
+	</style>
 </head>
+
+
 <body>
-<div class="container py-5">
-	<h1>Register</h1>
+<div class="registerBox">
+	<h2>Create Account</h2>
 	<form method="POST">
 		{% csrf_token %}
-		{{ form|crispy }}
-		<button class="btn btn-primary" type="submit">Register</button>
+		<!--{{form.username.label}}
+		{{form.username}}-->
+		<div class="usern">
+			<h4> Username</h4>
+			{{form.username}}
+		</div>
+		<div class="email"> 
+			<h4> Email </h4>
+			{{form.email}} 
+		</div>
+		<div class="password1">
+			<h4> Password </h4>
+			{{form.password1}}
+			<div class="paragraph">
+				<p> Use 8 or more characters. Letters, digits, and @/./+/-/_ only </p>
+			</div>
+		
+		</div>	
+		<div class="password2">
+			<h4> Confirm Password </h4>
+			{{form.password2}}
+		</div>
+		<div class = "regButton">
+			<button class="btn btn-primary" type="submit">Register</button>
+		</div>
+		
 	</form>
-	<p class="text-center">If you already have an account, <a href="{% url 'account:login' %}">login</a> instead.</p>
+	<div class = "rightBox">
+		<h1> Register For <br/> NYU BeatBuddies</h1>
+		<h4> Already have an account? </h4>
+		<div class = "loginButton">
+		  <form action = "/account/login">
+			<button type="submit" class="button">Login</button>
+		  </form>
+		</div>
+	</div>
 </div>
 </body>
 </html>
