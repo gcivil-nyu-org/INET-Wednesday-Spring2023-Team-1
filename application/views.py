@@ -390,7 +390,7 @@ def profile(request):
         or initial_genres == {}
         or initial_prompts == {}
     ):
-        return redirect("profile/edit")
+        return redirect("application:profile_edit")
     context = {}
     context.update(initial_songs)
     context.update(initial_artists)

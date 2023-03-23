@@ -32,9 +32,9 @@ class TestViews(TestCase):
         assert self.user.is_authenticated
         response = self.client.get(url_path)
         self.assertEqual(response.status_code, 200)
-    
+
     # maybe we already have this one?
-    # def test_user_logout(self):                           
+    # def test_user_logout(self):
     #     update_session(self.client, self.student.username, user_type=UserType.STUDENT)
     #     response = self.client.get(reverse("dashboard:logout"))
     #     self.assertRedirects(response, reverse("landingpage:index"))
@@ -42,13 +42,28 @@ class TestViews(TestCase):
     #     response = self.client.get(reverse("dashboard:dashboard"))
     #     self.assertRedirects(response, reverse("landingpage:index"))
 
-    # want a return message saying invalid username or password and "return to Login"
-    def test_invalid_login_valid_username(self):
-        url_path = reverse("application:profile")
-        self.client.login(username=TEST_USER, password="dfgljk")
-        response = self.client.get(url_path)
-        self.assertEqual(response.url, reverse('account:login'))
-        self.assertEqual(response.status_code, 302)
-    
 
-    
+class LoginViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.url = reverse("account:login")
+        self.user = User.objects.create_user(
+            username="testuser", email="testuser@example.com", password="testpass"
+        )
+
+    def test_get(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_valid_login(self):
+        data = {"username": "testuser", "password": "testpass"}
+        response = self.client.post(self.url, data, follow=True)
+        self.assertRedirects(response, reverse("application:profile_edit"))
+
+    def test_invalid_login(self):
+        data = {"username": "testuser", "password": "wrongpass"}
+        response = self.client.post(self.url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "registration/login.html")
+
+        # self.assertContains(response, 'Please enter a correct username and password.')

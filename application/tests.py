@@ -1,7 +1,6 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 
-from .models import FavoriteSong
 import os
 
 # from bs4 import BeautifulSoup
@@ -49,7 +48,7 @@ class HomeTestCase(TestCase):
         # self.assertEqual(heading.text, "Matches")
         return
 
-    def test_meaningful_song_exists(self):
+        # def test_meaningful_song_exists(self):
         # response = self.client.get(self.url)
         # Test if the response status code is 200
         # self.assertEqual(response.status_code, 200)
@@ -67,5 +66,3 @@ class HomeTestCase(TestCase):
     #     button = soup.select_one('button')
     #     self.assertIsNotNone(button)
     #     self.assertEqual(button.text, "Discover People")
-
-   
