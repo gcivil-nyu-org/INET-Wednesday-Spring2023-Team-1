@@ -141,3 +141,14 @@ class EventList(models.Model):
 
     def __str__(self):
         return f"{self.event_name}-{self.start_date}"
+
+
+class Reports(models.Model):
+    reported_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="reported_by"
+    )
+    report_message = models.CharField(max_length=500)
+    reported_time = models.DateTimeField(auto_now_add=True)
+    reported_profile = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="reported_user"
+    )

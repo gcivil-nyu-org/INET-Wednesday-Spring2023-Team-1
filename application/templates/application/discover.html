@@ -14,7 +14,31 @@
         <link rel="stylesheet" href="{% static 'application/profile_edit/jquery-ui-1.13.2.custom/jquery-ui.css' %}">
         <script src="{% static 'application/profile_edit/jquery-ui-1.13.2.custom/jquery-ui.min.js' %}"></script>
 
+        <script type="text/javascript">
+            window.onSpotifyIframeApiReady = (IFrameAPI) => {
+            const element = document.getElementById('embed-iframe');
+            const options = {
+              width: '100%',
+              height: '200',
+              uri: 'spotify:track:{{song1_id}}'
+            };
+
+            const callback = (EmbedController) => {
+              document.querySelectorAll('.click_song').forEach(
+                click_song => {
+                  click_song.addEventListener('click', () => {
+                    EmbedController.loadUri(click_song.dataset.spotifyId)
+                    EmbedController.togglePlay();
+                  });
+                })
+            };
+            IFrameAPI.createController(element, options, callback);
+          };
+        </script>
+
         <script>
+          var out_of_users = "{{ out_of_users }}";
+
           $( function() {
             var raw_matches = [
             {% for match in matches_data %}
@@ -115,8 +139,13 @@
                     <div class="logo">
                         <h3>NYUBeatBuddies</h3>
                     </div>
-                    <div class="edit-profile">
-                        <a href="{% url 'account:logout' %}">Logout</a>
+                    <div class="right-buttons">
+                        <div class="report-user">
+                            <a href="#"style="font-size: 22px;"title="Report User">&#9872;</a>
+                        </div>
+                        <div class="logout">
+                            <a href="{% url 'account:logout' %}" class="edit-button">Logout</a>
+                        </div>
                     </div>
                 </div>
                 <div class="right-section-content">
@@ -139,57 +168,73 @@
                             <div class="songs-column">
                                 <h3>Top Songs</h3>
                                 <ul>
-                                    <li id="discover_song1" style="background-color:#cdb4db;">{{song1_name_artist}}</li>
-                                    <li id="discover_song2" style="background-color:#ffc8dd;">{{song2_name_artist}}</li>
-                                    <li id="discover_song3" style="background-color:#ffafcc;">{{song3_name_artist}}</li>
-                                    <li id="discover_song4" style="background-color:#bde0fe;">{{song4_name_artist}}</li>
-                                    <li id="discover_song5" style="background-color:#a2d2ff;">{{song5_name_artist}}</li>
+
+                                <li class="click_song" data-spotify-id="spotify:track:{{song1_id}}" style="background-color: #cdb4db">
+                                    {{song1_name_artist}}
+                                </li>
+                                <li class="click_song" data-spotify-id="spotify:track:{{song2_id}}" style="background-color: #ffc8dd">
+                                    {{song2_name_artist}}
+                                </li>
+                                <li class="click_song" data-spotify-id="spotify:track:{{song3_id}}" style="background-color: #ffafcc">
+                                    {{song3_name_artist}}
+                                </li>
+                                <li class="click_song" data-spotify-id="spotify:track:{{song4_id}}" style="background-color: #bde0fe">
+                                    {{song4_name_artist}}
+                                </li>
+                                <li class="click_song" data-spotify-id="spotify:track:{{song5_id}}" style="background-color: #a2d2ff">
+                                    {{song5_name_artist}}
                                 </ul>
                             </div>
                             <ul>
-                                <div>
-                                    <h3>About me</h3>
+                                <div class="iframe-container">
+                                    <div id="embed-iframe"></div>
+                                    <script src="https://open.spotify.com/embed-podcast/iframe-api/v1" async></script>
                                 </div>
-                                <li>
+                                <div class = "about-you">
                                     <div>
-                                        <h4 id="discover_prompt1">{{prompt1}}</h4>
-                                        <div class="answer">
-                                            <div id="discover_response1" class="box">{{response1}}</div>
-                                        </div>
+                                        <h3>About Me</h3>
                                     </div>
-                                </li>
-                                <li>
-                                    <div>
-                                        <h4 id="discover_prompt2">{{prompt2}}</h4>
-                                        <div class="answer">
-                                            <div id="discover_response2" class="box">{{response2}}</div>
+                                    <li>
+                                        <div>
+                                            <h4 id="discover_prompt1">{{prompt1}}</h4>
+                                            <div class="answer">
+                                                <div id="discover_response1" class="box">{{response1}}</div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div>
-                                        <h4 id="discover_prompt3">{{prompt3}}</h4>
-                                        <div class="answer">
-                                            <div id="discover_response3" class="box">{{response3}}</div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <h4 id="discover_prompt2">{{prompt2}}</h4>
+                                            <div class="answer">
+                                                <div id="discover_response2" class="box">{{response2}}</div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div>
-                                        <h4 id="discover_prompt4">{{prompt4}}</h4>
-                                        <div class="answer">
-                                            <div id="discover_response4" class="box">{{response4}}</div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <h4 id="discover_prompt3">{{prompt3}}</h4>
+                                            <div class="answer">
+                                                <div id="discover_response3" class="box">{{response3}}</div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div>
-                                        <h4 id="discover_prompt5">{{prompt5}}</h4>
-                                        <div class="answer">
-                                            <div id="discover_response5" class="box">{{response5}}</div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <h4 id="discover_prompt4">{{prompt4}}</h4>
+                                            <div class="answer">
+                                                <div id="discover_response4" class="box">{{response4}}</div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </li>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <h4 id="discover_prompt5">{{prompt5}}</h4>
+                                            <div class="answer">
+                                                <div id="discover_response5" class="box">{{response5}}</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </div>
                             </ul>
                             <ul>
                                 <div id="favorite-genres">
@@ -297,54 +342,70 @@
                             </div>
                         </div>
                     </div>
-                    <div class="savedEvents">
-                        <div class="interested-events" id="interested-events">
-                            <h3> Interested Events </h3>
-                            {% for item in interested_events %}
-                                <div class = "interested-event">
-                                    <img src={{item.7}}>
-                                    <div class="date-time">
-                                        <span id = "date" >
-                                            {{ item.1 }} {{ item.2 }}
-                                        </span><br/>
-                                        <span id = "day_time" >
-                                            {{ item.3 }} &#x2022; {{ item.4 }}
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <span id = "event_name" >
-                                            {{ item.0 }}
-                                        </span><br/>
-                                        <span id = "venue_name_city" >
-                                            {{ item.5 }} 
-                                        </span>
-                                    </div>
-                                </div> 
-                            {% endfor %}
+                    <div class="events">
+                        {% if past_events %}
+                        <div class="pastEvents" id="pastEvents">
+                            <div class="past-events">
+                                <h3>Past Events</h3>
+                                {% for item in past_events %}
+                                <div class="interested-event">
+                                <img src="{{item.7}}" />
+                                <div class="date-time">
+                                    <span id="date"> {{ item.1 }} {{ item.2 }} </span><br />
+                                    <span id="day_time">
+                                    {{ item.3 }} &#x2022; {{ item.4 }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span id="event_name"> {{ item.0 }} </span><br />
+                                    <span id="venue_name_city"> {{ item.5 }} </span>
+                                </div>
+                                </div>
+                                {% endfor %}
+                            </div>    
                         </div>
-                        <div class="going-to-events" id="going-to-events">
-                            <h3> Going to Events </h3>
-                            {% for item in going_to_events %}
-                                <div class = "going-to-event">
-                                    <img src={{item.7}}>
-                                    <div class="date-time">
-                                        <span id = "date" >
-                                            {{ item.1 }} {{ item.2 }}
-                                        </span><br/> 
-                                        <span id = "day_time" >
-                                            {{ item.3 }} &#x2022; {{ item.4 }}
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <span id = "event_name" >
-                                            {{ item.0 }}
-                                        </span><br/>
-                                        <span id = "venue_name_city" >
-                                            {{ item.5 }} 
-                                        </span> 
-                                    </div> 
-                                </div> 
-                            {% endfor %}
+                        {% endif %}
+                        <div class="saved-events" id="saved-events">
+                            {% if interested_events %}
+                            <div class="interested-events" id="interested-events">
+                                <h3>Interested Events</h3>
+                                {% for item in interested_events %}
+                                <div class="interested-event">
+                                <img src="{{item.7}}" />
+                                <div class="date-time">
+                                    <span id="date"> {{ item.1 }} {{ item.2 }} </span><br />
+                                    <span id="day_time">
+                                    {{ item.3 }} &#x2022; {{ item.4 }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span id="event_name"> {{ item.0 }} </span><br />
+                                    <span id="venue_name_city"> {{ item.5 }} </span>
+                                </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if going_to_events %}
+                            <div class="going-to-events" id="going-to-events">
+                                <h3>Going to Events</h3>
+                                {% for item in going_to_events %}
+                                <div class="going-to-event">
+                                <img src="{{item.7}}" />
+                                <div class="date-time">
+                                    <span id="date"> {{ item.1 }} {{ item.2 }} </span><br />
+                                    <span id="day_time">
+                                    {{ item.3 }} &#x2022; {{ item.4 }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span id="event_name"> {{ item.0 }} </span><br />
+                                    <span id="venue_name_city"> {{ item.5 }} </span>
+                                </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="footer footer-swipe">
@@ -379,6 +440,44 @@
                     </div>
                 </div>
             </div>
+
+
+
+            <div id="report-user-popup" style="display:none;">
+                <button class="close-report-user" style="background: none; border: none; position: absolute; top: 0; right: 0;">&times;</button>
+                <div style="display: flex;justify-content: center;flex-direction: column;align-items: center; position: relative;">
+                    
+                    <h3 class="report_user_title" style="font-family:  'Franklin Gothic Medium', sans-serif; font-size: 30px; margin: 0;">Report Profile</h3>
+                    <p class="report_user_sub" style="font-family:  'Franklin Gothic Medium', sans-serif; font-size: 17px; margin: 0;">
+                     Please add details regarding your report of this profile.</p>
+                    <div class="report-text-area">
+                        <textarea rows="5" cols="25" style="resize: none;"></textarea>
+                    </div>
+                    <button class="submit-report-button">Submit Report</button>
+                </div>
+            </div>
+
+
+
+            </div>
+            <div id="no-more-users" style="display:none;">
+                <div style="display: flex;justify-content: center;flex-direction: column;align-items: center;">
+                    <p class="no_users_title" style="font-family:  'Franklin Gothic Medium', sans-serif; font-size: 30px; margin: 0;">No more potential matches</p>
+                    <p class="no_users_sub" style="font-family:  'Franklin Gothic Medium', sans-serif; font-size: 17px; margin: 0;">
+                    You've seen all potential matches in your area. <br> Please check back later to find more people to connect with!</p>
+                    <div style="display: flex;justify-content: center;flex-direction: row">
+                        <button class="close-discover-button"
+                            onClick="javascript:clickinner(this);">Back To Profile</button>
+                    </div>
+                </div>
+                <script>
+                    // redirect back to profile
+                    function clickinner(mybtn){
+                       location.href="{% url 'application:profile' %}";
+                    };
+                </script>
+            </div>
+        
         </div>
     </body>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -428,6 +527,28 @@
             text-align: center;
         }
 
+        .close-discover-button {
+            display: block;
+            position: relative;
+            top: 50px;
+            padding: 15px 20px;
+            font-size: 20px;
+            color: #fff;
+            background-color: purple;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            width: 180px;
+            text-align: center;
+        }
+
+        /* .close-discover-button:hover {
+            background-color: white;
+            color: purple;
+            border:4px solid purple;
+        } */
+
         .chat-match-button {
             display: block;
             padding: 10px 20px;
@@ -441,8 +562,71 @@
             width: 100px;
             text-align: center;
         }
+
+        .no_users_title {
+            text-align: center;
+        }
+
+        .no_users_sub {
+            text-align: center;
+            position: relative;
+            top: 20px;
+        }
+
+
     </style>
     <script>
+        $(document).ready(function () {
+            $('.report-user').on('click', function () {
+
+                $('#report-user-popup').dialog({
+                    width: 325,
+                    height: 350,
+                    modal: true,
+                    resizable: false,
+                    draggable: true,
+                });
+            });
+
+            $('.close-report-user').on('click', function () {
+                $('#report-user-popup').dialog('close');
+            });
+
+            $('.submit-report-button').on('click', function () {
+
+                $.ajax({
+                    url: 'submit_report',
+                    type: 'POST',
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        'report_message': $('.report-text-area textarea').val(),
+                        'reported_profile_id': {{discover_user.user_id}},
+                    },
+                    success: function (data) {
+                        if (data.status === 'success') {
+                            console.log('Report successful');
+                        } else {
+                            console.log('Report failed.');
+                        }
+                        $('#report-user-popup').dialog('close');
+                    },
+                });
+            });
+
+        });
+
+        $(document).ready(function () {
+            if (out_of_users === "True") {
+                $('#no-more-users').dialog({
+                    width: 300,
+                    height: 365,
+                    modal: true,
+                    resizable: false,
+                    draggable: true,
+                })
+            }
+        });     
+
         $(document).ready(function () {
             $('#like-button').click(function () {
                 $.ajax({
@@ -497,7 +681,19 @@
                         $('#discover_artist3').html(response.discover_favorite_artists.artist3_name);
                         $('#discover_artist4').html(response.discover_favorite_artists.artist4_name);
                         $('#discover_artist5').html(response.discover_favorite_artists.artist5_name); 
-                        $('.interested-events').empty();
+                        $('.pastEvents').empty();
+                        $('.pastEvents').html('<div class="past-events">')
+                        $('.past-events').html('<h3> Past Events </h3>')
+                        for (let item of response.past_events) {
+                            $('.past-events').append(
+                                '<div class="interested-event"><img src=' + item[7] + '><div class="date-time"><span id = "date" >' + item[1] + '&nbsp;' + item[2] + 
+                                '</span><br/><span id = "day_time" >' + item[3] + '&#x2022;' + item[4] + '</span></div><div><span id = "event_name" >' + item[0] + 
+                                '</span><br/><span id = "venue_name_city" >' + item[5] + '</span></div></div>'
+                            )
+                        }
+                        $('.pastEvents').append('</div>')  
+                        $('.saved-events').empty();
+                        $('.saved-events').html('<div class="interested-events">')
                         $('.interested-events').html('<h3> Interested Events </h3>')
                         for (let item of response.interested_events) {
                             $('.interested-events').append(
@@ -506,15 +702,16 @@
                                 '</span><br/><span id = "venue_name_city" >' + item[5] + '</span></div></div>'
                             )
                         }
-                        $('.going-to-events').empty();
+                        $('.saved-events').append('</div>')
+                        $('.saved-events').append('<div class="going-to-events">')
                         $('.going-to-events').html('<h3> Going to Events </h3>')
                         for (let item of response.going_to_events) {
                             $('.going-to-events').append(
                                 '<div class="going-to-event"><img src=' + item[7] + '><div class="date-time"><span id = "date" >' + item[1] + '&nbsp;' + item[2] + 
                                 '</span><br/><span id = "day_time" >' + item[3] + '&#x2022;' + item[4] + '</span></div><div><span id = "event_name" >' + item[0] + 
-                                '</span><br/><span id = "venue_name_city" >' + item[5] + '</span></div></div>'
-                            )
-                        }   
+                                '</span><br/><span id = "venue_name_city" >' + item[5] + '</span></div></div>'                                )
+                        } 
+                        $('.saved-events').append('</div>')             
                         $('.match').remove();
                         $('#matched-person-picture').attr('src', response.previous_user.profile_picture);
                         $('#matched-person-first').html(response.previous_user.first_name);
@@ -535,6 +732,17 @@
 
                             })
                         }
+                        if (response.out_of_users) {
+                            $('#no-more-users').dialog({
+                                width: 300,
+                                height: 365,
+                                modal: true,
+                                resizable: false,
+                                draggable: true,
+
+                            })
+                        }
+
 
                     }
                 });
@@ -594,7 +802,19 @@
                         $('#discover_artist3').html(response.discover_favorite_artists.artist3_name);
                         $('#discover_artist4').html(response.discover_favorite_artists.artist4_name);
                         $('#discover_artist5').html(response.discover_favorite_artists.artist5_name);
-                        $('.interested-events').empty();
+                        $('.pastEvents').empty();
+                        $('.pastEvents').html('<div class="past-events">')
+                        $('.past-events').html('<h3> Past Events </h3>')
+                        for (let item of response.past_events) {
+                            $('.past-events').append(
+                                '<div class="interested-event"><img src=' + item[7] + '><div class="date-time"><span id = "date" >' + item[1] + '&nbsp;' + item[2] + 
+                                '</span><br/><span id = "day_time" >' + item[3] + '&#x2022;' + item[4] + '</span></div><div><span id = "event_name" >' + item[0] + 
+                                '</span><br/><span id = "venue_name_city" >' + item[5] + '</span></div></div>'
+                            )
+                        }
+                        $('.pastEvents').append('</div>')  
+                        $('.saved-events').empty();
+                        $('.saved-events').html('<div class="interested-events">')
                         $('.interested-events').html('<h3> Interested Events </h3>')
                         for (let item of response.interested_events) {
                             $('.interested-events').append(
@@ -603,15 +823,16 @@
                                 '</span><br/><span id = "venue_name_city" >' + item[5] + '</span></div></div>'
                             )
                         }
-                        $('.going-to-events').empty();
+                        $('.saved-events').append('</div>')
+                        $('.saved-events').append('<div class="going-to-events">')
                         $('.going-to-events').html('<h3> Going to Events </h3>')
                         for (let item of response.going_to_events) {
                             $('.going-to-events').append(
                                 '<div class="going-to-event"><img src=' + item[7] + '><div class="date-time"><span id = "date" >' + item[1] + '&nbsp;' + item[2] + 
                                 '</span><br/><span id = "day_time" >' + item[3] + '&#x2022;' + item[4] + '</span></div><div><span id = "event_name" >' + item[0] + 
                                 '</span><br/><span id = "venue_name_city" >' + item[5] + '</span></div></div>'
-                            )
-                        }             
+                            )                            }      
+                        $('.saved-events').append('</div>')                     
                         $('.match').remove();
                         $('#matched-person-picture').attr('src', response.previous_user.profile_picture);
                         $('#matched-person-first').html(response.previous_user.first_name);
@@ -621,6 +842,16 @@
                                 '<div class="match"><a href="profile/match/'+match.pk+'/"><img src=' + match.profile_picture + ' alt="Match 1"></a>' +
                                 '<span class="profile-name"><a href="profile/match/'+match.pk+'/">' + match.first_name + '</a></span></div>'
                             )
+                        }
+                        if (response.out_of_users) {
+                            $('#no-more-users').dialog({
+                                width: 300,
+                                height: 365,
+                                modal: true,
+                                resizable: false,
+                                draggable: true,
+
+                            })
                         }
                     }
                 });

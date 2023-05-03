@@ -3,7 +3,7 @@
 <html>
 
     <head>
-        <title>Discover Page</title>
+        <title>Moderator View</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
             integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
@@ -13,7 +13,6 @@
         <link rel="stylesheet" href="{% static 'application/profile_edit/jquery-ui-1.13.2.custom/jquery-ui.css' %}">
         <script src="{% static 'application/profile_edit/jquery-ui-1.13.2.custom/jquery-ui.min.js' %}"></script>
         <link rel="stylesheet" type="text/css" href="{% static 'application/css/profiles.css' %}" />
-
         <script type="text/javascript">
             window.onSpotifyIframeApiReady = (IFrameAPI) => {
             const element = document.getElementById('embed-iframe');
@@ -35,31 +34,6 @@
             IFrameAPI.createController(element, options, callback);
           };
         </script>
-
-        <script>
-          $( function() {
-            var raw_matches = [
-            {% for match in matches_data %}
-                "{{match.first_name}} {{match.last_name}}{{match.pk}}",
-            {% endfor %}
-            ];
-
-            var matches = [];
-            for (match in raw_matches) {
-                matches.push({label:raw_matches[match].slice(0,-1), value: raw_matches[match].slice(-1)});
-            };
-            $( "#matchsearch" ).autocomplete({
-                source: matches,
-                select: function(event, ui) {
-                    event.preventDefault()
-                    $("#matchsearch").val(ui.item.label);
-                    var pk = ui.item.value;
-                    var url_mask = "{% url 'application:match_profile' 99 %}".replace(/99/, pk.toString())
-                    location.href = url_mask
-                }
-            });
-          });
-        </script>
     </head>
 
     <body>
@@ -67,86 +41,7 @@
             integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous">
             </script>
         <div class="container">
-            <div class="left">
-                <div class="sidebar-profile">
-                    <div class="profile-picture">
-                        <a href="{% url 'application:profile' %}">
-                            <img src="{{ profile_picture.url }}" alt="Image" draggable="false" />
-                        </a>
-                    </div>
-                    <div class="profile">
-                        <span class="profile-name">
-                            <a href="{% url 'application:profile' %}" class="name">{{user.first_name}} {{user.last_name}}</a>
-                        </span>
-                    </div>
-                </div>
-                <h2>Matches</h2>
-                <div class="matches" id="matches">
-                    {% for match in matches_data %}
-                    <div class="match">
-                        <a href="{% url 'application:match_profile' match_pk=match.pk %}">
-                            <img src={{match.profile_picture}} alt="Match 1">
-                        </a>
-                        <span class="profile-name">
-                            <a href="{% url 'application:match_profile' match_pk=match.pk %}">{{match.first_name}}</a>
-                        </span>
-                    </div>
-                    {% endfor %}
-                </div>
-                <h3>Search Matches</h3>
-                <div class="search-container">
-                    <input type="text" placeholder="Search for matches..." id = "matchsearch">
-                </div>
-                <h3>Messages</h3>
-                <div class="messages-section">
-                    {% for message in chat_history %}
-                    <a href="{% url 'chat:room' %}?friend_pk={{message.friend_pk}}" class="message-link">
-                        <div class="message-card">
-                            <img
-                            src="{{message.friend_picture}}"
-                            alt="Profile Picture"
-                            class="message-picture"
-                            />
-                            <div class="message-details">
-                                <h3 class="message-sender">{{message.friend_name}}</h3>
-                                <p class="message-preview">{{message.latest_message}}</p>
-                            </div>
-                            <div class="message-time">
-                                <p>{{message.timestamp}}</p>
-                                {% if message.unread_messages > 0 %}
-                                <div class="message-count">{{message.unread_messages}}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </a>
-                    {% endfor %}
-                </div>
-                <div class="footer">
-                    <div class="discover-events-wrapper">
-                        <a href="{% url 'application:events' %}">
-                        <button class="discover-events-button">Discover Events</button>
-                        </a>
-                    </div>
-                </div>
-            </div>
             <div class="right-section">
-                <div class="right-header">
-                    <div class="logo">
-                        <h3>NYUBeatBuddies</h3>
-                    </div>
-                    <div class="right-buttons">
-                        <div class="edit-profile">
-                            <a href="{% url 'chat:room' %}?friend_pk={{matched_user.user_id}}" class="edit-button">Chat</a>
-                        </div>
-                        <div class="edit-profile">
-                            <a href="{% url 'application:remove_match' match_pk=matched_user.user_id %}" class="edit-button">Remove Match</a>
-                        </div>
-                        <div class="report-user">
-                            <a href="#"style="font-size: 22px;"title="Report User">&#9872;</a>
-                            <!-- <a href="#"title="Report User">&#9888;</a> -->                      
-                        </div>
-                    </div>
-                </div>
                 <div class="right-section-content">
                     <div class="right-section-top">
                         <div class="left-column">
@@ -406,14 +301,14 @@
                           {% endif %}
                         </div>
                       </div> 
-                    </div>
-                    <div class="footer">
+                      <div class="footer">
                         <div class="discover-events-wrapper">
-                            <a href="{% url 'application:discover' %}">
-                                <button class="discover-events-button">Discover People</button>
-                            </a>
+                          <a href="{% url 'application:reports' %}">
+                            <button class="discover-events-button">Back to Reports</button>
+                          </a>
                         </div>
-                    </div>            
+                      </div>
+                    </div>           
                 </div>          
             </div>
     </body>

@@ -116,7 +116,10 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect(reverse("application:profile"))
+                if request.user.groups.filter(name="Moderator").exists():
+                    return redirect(reverse("application:reports"))
+                else:
+                    return redirect(reverse("application:profile"))
             else:
                 return render(request, "registration/login.html", context)
         else:

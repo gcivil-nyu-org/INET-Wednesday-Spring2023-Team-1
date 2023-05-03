@@ -49,6 +49,12 @@
         });
       });
     </script>
+    <script>
+      $(document).ready(function() {
+        var container = $('.messages');
+        container.scrollTop(container.prop("scrollHeight"));
+      });
+    </script>
 
     <link
       rel="stylesheet"
@@ -143,8 +149,10 @@
           <div class="logo">
               <h3>NYUBeatBuddies</h3>
           </div>
-          <div class="edit-profile">
-              <a href="{% url 'account:logout' %}">Logout</a>
+          <div class="right-buttons">
+            <div class="logout">
+                <a href="{% url 'account:logout' %}" class="edit-button">Logout</a>
+            </div>
           </div>
         </div>
         <div class="message-section-right"> 
@@ -174,6 +182,7 @@
             <input
               type="text"
               id="message-input"
+              class="message-input"
               name="message"
               placeholder="Type your message..."
             />
@@ -185,6 +194,7 @@
   </body>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
   <link
     rel="stylesheet"
     href="https://code.jquery.com/ui/1.13.0/themes/smoothness/jquery-ui.css"
@@ -208,7 +218,6 @@
                     $('.message-box-left').remove();
                     $('.message-box-right').remove();
                     for (let message of response.messages) {
-                        console.log("\n\n\n\n we have time",message.timestamp,typeof(message.timestamp),"\n\n\n")
                         var date = new Date(message.timestamp);
                         var options = { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
                         var time = date.toLocaleString('en-US', options);
@@ -217,8 +226,40 @@
 
                     }
                     $('#message-input').val(''); 
+                    $('.messages').scrollTop($('.messages')[0].scrollHeight);
                   }
               })};
           });
+  </script>
+  <script>
+
+    // Enable pusher logging - don't include this in production
+    Pusher.logToConsole = false;
+
+    var pusher = new Pusher('c352f4c54553c2f05313', {
+      cluster: 'us3'
+    });
+    var room_pk = {{room.pk}}
+    var friend_pk = {{friend.pk}}
+    var channelName = "room-"+room_pk.toString()
+    var eventName = "new-message-"+friend_pk.toString()
+    var channel = pusher.subscribe(channelName);
+    channel.bind(eventName, function(message) {
+      //alert(JSON.stringify(data));
+      var date = new Date(message.timestamp);
+      var options = { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+      var time = date.toLocaleString('en-US', options);
+      var newMessage = $('<div class="message-box-left"><span class="message-content">'+message.content+'</span><span class="timestamp">'+time+'</span></div>');
+      $('.messages').append(newMessage);
+      $('.messages').scrollTop($('.messages')[0].scrollHeight);
+      newMessage.addClass('highlight');
+      setTimeout(function() {
+        newMessage.animate({backgroundColor: 'transparent'}, 3000, function() {
+          console.log("\n\n\n Timeout time \n\n\n\n")
+          newMessage.removeClass('highlight');
+        });
+      }, 4000);
+      
+    });
   </script>
 </html>

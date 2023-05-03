@@ -296,6 +296,7 @@ a {
     text-decoration: none;
 }
 
+
 .right-section-content {
     padding: 20px;
     padding-bottom: 0;
@@ -396,6 +397,21 @@ a {
 .songs-column ul li {
     color: darkred;
     padding: 5px;
+}
+
+.iframe-container {
+    display: flex;
+    flex-direction: row;
+    padding-top: 20px;
+    height: 175px
+}
+
+.click_song {
+    cursor: pointer;
+}
+
+.right-section-top .left-column .click_song:hover {
+    color: #bc62d8;
 }
 
 .image-frame {

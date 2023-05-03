@@ -24,6 +24,8 @@
     />
     <script src="{% static 'application/profile_edit/jquery-ui-1.13.2.custom/jquery-ui.min.js' %}"></script>
 
+
+
     <style>
       :root {
         --badge1: "M125 0L106.292 20.4271L81.5938 7.54167L71.0938 33.0417L43.4167 29.25L42.4167 56.75L15.0938 62.5L23.6667 88.6771L0 103.292L17.1771 125.01L0 146.708L23.6667 161.323L15.0938 187.5L42.4167 193.26L43.4167 220.75L71.0938 216.969L81.5938 242.469L106.292 229.583L125 250L143.719 229.583L168.406 242.469L178.927 216.969L206.594 220.75L207.594 193.26L234.917 187.5L226.333 161.323L250 146.708L232.823 125.01L250 103.292L226.333 88.6771L234.917 62.5L207.594 56.75L206.594 29.25L178.927 33.0417L168.406 7.54167L143.719 20.4271L125 0Z";
@@ -283,17 +285,6 @@
         background: linear-gradient(to bottom, #496067 0%, #e2b7cd 100%);
       }
 
-      .edit-profile {
-        padding: 15px;
-        text-align: right;
-      }
-
-      .edit-profile a {
-        color: purple;
-        font-weight: bold;
-        font-size: 18px;
-      }
-
       .right-section-content {
         padding: 20px;
         overflow-x: hidden;
@@ -415,6 +406,21 @@
       .songs-column ul li {
         color: darkred;
         padding: 5px;
+      }
+      .about-you {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .about-you ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .about-you h3,
+      .about-you h4 {
+        text-align: center;
       }
 
       .bottom-column {
@@ -643,8 +649,29 @@
     <link
       rel="stylesheet"
       type="text/css"
-      href="{% static 'application/css/profiles.css' %}"
-    />
+      href="{% static 'application/css/profiles.css' %}"/>
+
+    <script type="text/javascript">
+      window.onSpotifyIframeApiReady = (IFrameAPI) => {
+        const element = document.getElementById('embed-iframe');
+        const options = {
+          width: '100%',
+          height: '200',
+          uri: 'spotify:track:{{song1_id}}'
+        };
+
+        const callback = (EmbedController) => {
+          document.querySelectorAll('.click_song').forEach(
+            click_song => {
+              click_song.addEventListener('click', () => {
+                EmbedController.loadUri(click_song.dataset.spotifyId)
+                EmbedController.togglePlay();
+              });
+            })
+        };
+        IFrameAPI.createController(element, options, callback);
+      };
+    </script>
 
     <script>
       $( function() {
@@ -670,14 +697,14 @@
         });
       });
     </script>
-  </head>
-
-  <body>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
-      crossorigin="anonymous"
-    ></script>
+      crossorigin="anonymous">
+    </script>
+  </head>
+
+  <body>
     <div class="container">
       <div class="left">
         <div class="sidebar-profile">
@@ -758,9 +785,13 @@
           <div class="logo">
             <h3>NYUBeatBuddies</h3>
           </div>
-          <div class="edit-profile">
-            <a href="{% url 'application:profile_edit' %}">Edit</a>
-            <a href="{% url 'account:logout' %}">Logout</a>
+          <div class="right-buttons">
+            <div class="edit-profile">
+              <a href="{% url 'application:profile_edit' %}" class="edit-button">Edit</a>
+            </div>
+            <div class="logout">
+              <a href="{% url 'account:logout' %}" class="edit-button">Logout</a>
+            </div>
           </div>
         </div>
         <div class="right-section-content">
@@ -769,31 +800,35 @@
               <div class="songs-column">
                 <h3>Your Top Songs</h3>
                 <ul>
-                  <li style="background-color: #cdb4db">
+                  <li class="click_song" data-spotify-id="spotify:track:{{song1_id}}" style="background-color: #cdb4db">
                     {{song1_name_artist}}
                   </li>
-                  <li style="background-color: #ffc8dd">
+                  <li class="click_song" data-spotify-id="spotify:track:{{song2_id}}" style="background-color: #ffc8dd">
                     {{song2_name_artist}}
                   </li>
-                  <li style="background-color: #ffafcc">
+                  <li class="click_song" data-spotify-id="spotify:track:{{song3_id}}" style="background-color: #ffafcc">
                     {{song3_name_artist}}
                   </li>
-                  <li style="background-color: #bde0fe">
+                  <li class="click_song" data-spotify-id="spotify:track:{{song4_id}}" style="background-color: #bde0fe">
                     {{song4_name_artist}}
                   </li>
-                  <li style="background-color: #a2d2ff">
+                  <li class="click_song" data-spotify-id="spotify:track:{{song5_id}}" style="background-color: #a2d2ff">
                     {{song5_name_artist}}
-                  </li>
                 </ul>
               </div>
               <ul>
+                <div class="iframe-container">
+                  <div id="embed-iframe"></div>
+                  <script src="https://open.spotify.com/embed-podcast/iframe-api/v1" async></script>
+                </div>
+                <div class = "about-you">
                 <div>
-                  <h3>About you</h3>
+                  <h3>About You</h3>
                 </div>
 
                 <li>
                   <div>
-                    <h4>{{prompt1}}</h4>
+                    <h4>{{prompt1}}:</h4>
                     <div class="answer">
                       <div class="box">{{response1}}</div>
                     </div>
@@ -801,7 +836,7 @@
                 </li>
                 <li>
                   <div>
-                    <h4>{{prompt2}}</h4>
+                    <h4>{{prompt2}}:</h4>
                     <div class="answer">
                       <div class="box">{{response2}}</div>
                     </div>
@@ -809,7 +844,7 @@
                 </li>
                 <li>
                   <div>
-                    <h4>{{prompt3}}</h4>
+                    <h4>{{prompt3}}:</h4>
                     <div class="answer">
                       <div class="box">{{response3}}</div>
                     </div>
@@ -817,7 +852,7 @@
                 </li>
                 <li>
                   <div>
-                    <h4>{{prompt4}}</h4>
+                    <h4>{{prompt4}}:</h4>
                     <div class="answer">
                       <div class="box">{{response4}}</div>
                     </div>
@@ -825,12 +860,13 @@
                 </li>
                 <li>
                   <div>
-                    <h4>{{prompt5}}</h4>
+                    <h4>{{prompt5}}:</h4>
                     <div class="answer">
                       <div class="box">{{response5}}</div>
                     </div>
                   </div>
                 </li>
+                </div>
               </ul>
               <ul>
                 <div id="favorite-genres">
@@ -960,78 +996,129 @@
               </div>
             </div>
           </div>
-          <div class="savedEvents">
-            <div class="interested-events" id="interested-events">
-              <h3>Interested Events</h3>
-              {% for item in interested_events %}
-              <div class="interested-event">
-                <img src="{{item.7}}" />
-                <div class="date-time">
-                  <span id="date"> {{ item.1 }} {{ item.2 }} </span><br />
-                  <span id="day_time">
-                    {{ item.3 }} &#x2022; {{ item.4 }}
-                  </span>
-                </div>
-                <div>
-                  <span id="event_name"> {{ item.0 }} </span><br />
-                  <span id="venue_name_city"> {{ item.5 }} </span>
-                  <!-- <span> -->
-                  <!-- <button name = "delete_interested" class="delete_i"> X </button> -->
-                  <!-- </span> -->
-                </div>
-                <form method="POST">
-                  {% csrf_token %}
-                  <input
-                    type="hidden"
-                    id="item"
-                    name="item"
-                    value="{{ item.8 }}"
-                  />
-                  <span class="z"
-                    ><button
-                      name="delete_interested"
-                      class="delete_i"
-                      value="interested"
+          <div class="events">
+            {% if past_events %}
+            <div class="pastEvents">
+              {% if past_events %}
+              <div class="past-events" id="past-events">
+                <h3>Past Events</h3>
+                {% for item in past_events %}
+                <div class="interested-event">
+                  <img src="{{item.7}}" />
+                  <div class="date-time">
+                    <span id="date"> {{ item.1 }} {{ item.2 }} </span><br />
+                    <span id="day_time">
+                      {{ item.3 }} &#x2022; {{ item.4 }}
+                    </span>
+                  </div>
+                  <div>
+                    <span id="event_name"> {{ item.0 }} </span><br />
+                    <span id="venue_name_city"> {{ item.5 }} </span>
+                    <!-- <span> -->
+                    <!-- <button name = "delete_interested" class="delete_i"> X </button> -->
+                    <!-- </span> -->
+                  </div>
+                  <form method="POST">
+                    {% csrf_token %}
+                    <input
+                      type="hidden"
+                      id="item"
+                      name="item"
+                      value="{{ item.8 }}"
+                    />
+                    <span class="z"
+                      ><button
+                        name="delete_going"
+                        class="delete_g"
+                        value="going"
+                      >
+                        X
+                      </button></span
                     >
-                      X
-                    </button></span
-                  >
-                </form>
+                  </form>
+                </div>
+                {% endfor %}
               </div>
-              {% endfor %}
+              {% endif %}
             </div>
-            <div class="going-to-events" id="going-to-events">
-              <h3>Going to Events</h3>
-              {% for item in going_to_events %}
-              <div class="going-to-event">
-                <img src="{{item.7}}" />
-                <div class="date-time">
-                  <span id="date"> {{ item.1 }} {{ item.2 }} </span><br />
-                  <span id="day_time">
-                    {{ item.3 }} &#x2022; {{ item.4 }}
-                  </span>
+            {% endif %}
+            <div class="saved-events">
+              {% if interested_events %}
+              <div class="interested-events" id="interested-events">
+                <h3>Interested Events</h3>
+                {% for item in interested_events %}
+                <div class="interested-event">
+                  <img src="{{item.7}}" />
+                  <div class="date-time">
+                    <span id="date"> {{ item.1 }} {{ item.2 }} </span><br />
+                    <span id="day_time">
+                      {{ item.3 }} &#x2022; {{ item.4 }}
+                    </span>
+                  </div>
+                  <div>
+                    <span id="event_name"> {{ item.0 }} </span><br />
+                    <span id="venue_name_city"> {{ item.5 }} </span>
+                    <!-- <span> -->
+                    <!-- <button name = "delete_interested" class="delete_i"> X </button> -->
+                    <!-- </span> -->
+                  </div>
+                  <form method="POST">
+                    {% csrf_token %}
+                    <input
+                      type="hidden"
+                      id="item"
+                      name="item"
+                      value="{{ item.8 }}"
+                    />
+                    <span class="z"
+                      ><button
+                        name="delete_interested"
+                        class="delete_i"
+                        value="interested"
+                      >
+                        X
+                      </button></span
+                    >
+                  </form>
                 </div>
-                <div>
-                  <span id="event_name"> {{ item.0 }} </span><br />
-                  <span id="venue_name_city"> {{ item.5 }} </span>
-                </div>
-
-                <form method="POST">
-                  {% csrf_token %}
-                  <input
-                    type="hidden"
-                    id="item"
-                    name="item"
-                    value="{{ item.8 }}"
-                  />
-                  <span class="y"
-                    ><button name="delete_going" class="delete_g" value="going">
-                      X
-                    </button></span
-                  >
-                </form>
+                {% endfor %}
               </div>
-              {% endfor %}
+              {% endif %}
+              {% if going_to_events %}
+              <div class="going-to-events" id="going-to-events">
+                <h3>Going to Events</h3>
+                {% for item in going_to_events %}
+                <div class="going-to-event">
+                  <img src="{{item.7}}" />
+                  <div class="date-time">
+                    <span id="date"> {{ item.1 }} {{ item.2 }} </span><br />
+                    <span id="day_time">
+                      {{ item.3 }} &#x2022; {{ item.4 }}
+                    </span>
+                  </div>
+                  <div>
+                    <span id="event_name"> {{ item.0 }} </span><br />
+                    <span id="venue_name_city"> {{ item.5 }} </span>
+                  </div>
+
+                  <form method="POST">
+                    {% csrf_token %}
+                    <input
+                      type="hidden"
+                      id="item"
+                      name="item"
+                      value="{{ item.8 }}"
+                    />
+                    <span class="y"
+                      ><button name="delete_going" class="delete_g" value="going">
+                        X
+                      </button></span
+                    >
+                  </form>
+                </div>
+                {% endfor %}
+              </div>
+              {% endif %}
             </div>
           </div>
           <div class="footer">

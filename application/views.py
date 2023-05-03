@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib.auth import update_session_auth_hash
-
+from common.decorators import moderator_no_access, moderator_only
+from .models import Reports
+import datetime
 
 # import os
 # from datetime import datetime
@@ -12,7 +14,6 @@ import calendar
 
 # from django.contrib.auth.forms import PasswordChangeForm
 import random
-import datetime
 from pytz import timezone
 
 # spotify api package
@@ -195,12 +196,42 @@ def get_favorite_data(curr_user, spotify="", get_pics=False):
 
 def home(request):
     if request.user.is_authenticated:
-        return redirect("application:profile")
+        if request.user.groups.filter(name="Moderator").exists():
+            return redirect("application:reports")
+        else:
+            return redirect("application:profile")
     else:
         return redirect("account:login")
 
 
+@moderator_only
+def reports(request):
+    reports = Reports.objects.all()
+    context = {"reports": []}
+    for r in reports:
+        reported_by = User.objects.get(pk=r.reported_by_id)
+        reported_by = Account.objects.get(user=reported_by)
+        reported_by = reported_by.__dict__
+        reported_by.pop("_state")
+        reported_profile = User.objects.get(pk=r.reported_profile_id)
+        reported_profile = Account.objects.get(user=reported_profile)
+        reported_profile = reported_profile.__dict__
+        reported_profile.pop("_state")
+        context["reports"].append(
+            {
+                "time": r.reported_time.strftime("%m/%d"),
+                "reported_by": reported_by,
+                "reported_profile": reported_profile,
+                "content": r.report_message,
+                "reported_by_pk": r.reported_by_id,
+                "reported_profile_pk": r.reported_profile_id,
+            }
+        )
+    return render(request, "application/reports.html", context)
+
+
 @login_required
+@moderator_no_access
 def profile_edit(request):
     client_credentials_manager = SpotifyClientCredentials()
     token_dict = client_credentials_manager.get_access_token()
@@ -430,13 +461,14 @@ def getMatchesData(user):
 
 
 @login_required
+@moderator_no_access
 def profile(request):
     spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 
     curr_user = request.user
     matches_data = getMatchesData(curr_user)
 
-    interested_events, going_to_events = getSavedEvents(curr_user)
+    interested_events, going_to_events, past_events = getSavedEvents(curr_user)
 
     user_data = Account.objects.get(user=curr_user).__dict__
     user_data.pop("_state")
@@ -476,6 +508,7 @@ def profile(request):
     context.update({"profile_picture": account.profile_picture})
     context.update({"interested_events": interested_events})
     context.update({"going_to_events": going_to_events})
+    context.update({"past_events": past_events})
 
     # remove old events from interested/going list
     tz = timezone("EST")
@@ -483,7 +516,7 @@ def profile(request):
     curr_date_pre = curr_date_time.strftime("%Y-%m-%d")
     curr_date = datetime.datetime.strptime(str(curr_date_pre), "%Y-%m-%d").date()
 
-    interested_events, going_to_events = getSavedEvents(curr_user)
+    interested_events, going_to_events, past_events = getSavedEvents(curr_user)
 
     try:
         saved_events_object = SavedEvents.objects.get(user=request.user)
@@ -558,11 +591,18 @@ def profile(request):
 
 
 @login_required
+@moderator_no_access
 def discover(request):
     global CURRENT_DISCOVER
     CURRENT_DISCOVER = getNextUserPk(request)
     spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
     curr_user = request.user
+    # Set variable to see if the user is out of matches
+    if curr_user.pk == CURRENT_DISCOVER:
+        out_of_users = True
+    else:
+        out_of_users = False
+
     matches_data = getMatchesData(curr_user)
     user_data = Account.objects.get(user=curr_user).__dict__
     user_data.pop("_state")
@@ -583,7 +623,7 @@ def discover(request):
         artist_art,
         album_art,
     ) = get_favorite_data(discover_user, spotify, True)
-    interested_events, going_to_events = getSavedEvents(discover_user)
+    interested_events, going_to_events, past_events = getSavedEvents(discover_user)
 
     account = Account.objects.get(user=curr_user)
     discover_account = Account.objects.get(user=discover_user)
@@ -605,6 +645,8 @@ def discover(request):
     context.update({"discover_profile_picture": discover_account.profile_picture})
     context.update({"interested_events": interested_events})
     context.update({"going_to_events": going_to_events})
+    context.update({"past_events": past_events})
+    context.update({"out_of_users": out_of_users})
     return render(request, "application/discover.html", context)
 
 
@@ -625,11 +667,16 @@ def getNextUserPk(request):
     all_users_pks = list(
         User.objects.filter(is_superuser=False).values_list("pk", flat=True)
     )
-    if len(all_users_pks) - len(previous_likes_and_dislikes) < 1:
-        return curr_user.pk
     for pk in previous_likes_and_dislikes:
         if pk in all_users_pks:
             all_users_pks.remove(pk)
+    moderators = Group.objects.get_or_create(name="Moderator")[0]
+    all_moderators = moderators.user_set.all()
+    for mod in all_moderators:
+        if mod.pk in all_users_pks:
+            all_users_pks.remove(mod.pk)
+    if len(all_users_pks) < 1:
+        return curr_user.pk
     random_user_pk = random.choice(all_users_pks)
     return random_user_pk
 
@@ -689,7 +736,14 @@ def getDiscoverProfile(request):
     # Get a random user not seen before
     next_user_pk = getNextUserPk(request)
     next_user = User.objects.get(pk=next_user_pk)
-    interested_events, going_to_events = getSavedEvents(next_user)
+
+    # Set variable to see if the user is out of matches
+    if curr_user.pk == next_user_pk:
+        out_of_users = True  # out of users = true
+    else:
+        out_of_users = False  # out of users = false
+
+    interested_events, going_to_events, past_events = getSavedEvents(next_user)
 
     # Pass next user to front end
     CURRENT_DISCOVER = next_user.pk
@@ -729,10 +783,13 @@ def getDiscoverProfile(request):
     }
     context.update({"interested_events": interested_events})
     context.update({"going_to_events": going_to_events})
+    context.update({"past_events": past_events})
+    context.update({"out_of_users": out_of_users})
     return JsonResponse(context)
 
 
 @login_required
+@moderator_no_access
 def discover_events(request):
     event_list = []
     all_events = EventList.objects.all()
@@ -779,9 +836,10 @@ def discover_events(request):
         )
     curr_user = request.user
     account = Account.objects.get(user=curr_user)
-    interested_events, going_to_events = getSavedEvents(curr_user)
+    interested_events, going_to_events, past_events = getSavedEvents(curr_user)
     interested_events_pk = []
     going_to_events_pk = []
+    past_events_pk = []
 
     for item in interested_events:
         curr_event = item[-2]
@@ -797,8 +855,10 @@ def discover_events(request):
     context.update({"event_list": event_list})
     context.update({"interested_events": interested_events})
     context.update({"going_to_events": going_to_events})
+    context.update({"past_events": past_events})
     context.update({"interested_events_pk": interested_events_pk})
     context.update({"going_to_events_pk": going_to_events_pk})
+    context.update({"past_events_pk": past_events_pk})
 
     if request.method == "POST":
         if request.POST.get("search-button"):
@@ -862,35 +922,11 @@ def discover_events(request):
                     saved_events_object.save()
                     return redirect("application:events")
 
-    # when the interested button is clicked - if using ajax
-    # if request.method == 'POST':
-    #     event = request.POST.get('item')
-    #     task = request.POST.get('interested')
-    #     # data=request.POST.get('data')
-    #     curr_event = request.POST.get('item')
-    #     # print("data: ", data)
-    #     print("tasK: ", task)
-    #     print("event", event)
-
-    # new = Todo(task=task)
-    # new.save()
-
-    # if request.GET.get("action") == "is_interested":
-    #     print("IN IS INTERESTED ACTION")
-
-    # elif request.GET.get("action") == "is_going":
-    #     print("IN IS GOING ACTION")
-    # print("item: ", request.GET.get('item'))
-    # print("current event: ", request.Get.get('item'))
-    # curr_event = request.POST.get('item')
-    # if curr_event not in saved_events.interestedEvents:
-    #     saved_events.interestedEvents.append(curr_event)
-    #     saved_events.save()
-
     return render(request, "application/discover_events.html", context)
 
 
 @login_required
+@moderator_no_access
 def your_events(request):
     event_list = []
     all_events = EventList.objects.all()
@@ -904,8 +940,7 @@ def your_events(request):
             # getting stripped standard time from datetime obj
             time_object = datetime.datetime.strptime(event.start_time, "%H:%M:%S")
             mil_time = time_object.time()
-            # std_time = mil_time.strftime("%-I:%M" "%p").lower()
-            std_time = mil_time.strftime("%M").lower()
+            std_time = mil_time.strftime("%I:%M %p").lstrip("0").lower()
             event_time_final = std_time
         # needed to remove old events from interested/going lists
         this_event_date = datetime.datetime.strptime(
@@ -937,9 +972,10 @@ def your_events(request):
         )
     curr_user = request.user
     account = Account.objects.get(user=curr_user)
-    interested_events, going_to_events = getSavedEvents(curr_user)
+    interested_events, going_to_events, past_events = getSavedEvents(curr_user)
     interested_events_pk = []
     going_to_events_pk = []
+    past_events_pk = []
 
     for item in interested_events:
         curr_event = item[-2]
@@ -955,8 +991,10 @@ def your_events(request):
     context.update({"event_list": event_list})
     context.update({"interested_events": interested_events})
     context.update({"going_to_events": going_to_events})
+    context.update({"past_events": past_events})
     context.update({"interested_events_pk": interested_events_pk})
     context.update({"going_to_events_pk": going_to_events_pk})
+    context.update({"past_events_pk": past_events_pk})
 
     if request.method == "POST":
         if request.POST.get("search-button"):
@@ -1023,7 +1061,61 @@ def your_events(request):
     return render(request, "application/your_events.html", context)
 
 
+@moderator_only
+def moderator_view(request, user_pk):
+    if request.user.groups.filter(name="Moderator").exists():
+        spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
+        matches_data = getMatchesData(request.user)
+        user_data = Account.objects.get(user=request.user).__dict__
+        user_data.pop("_state")
+        user_data["age"] = str(
+            datetime.date.today().year - int(user_data["birth_year"])
+        )
+        matched_user = User.objects.get(pk=user_pk)
+        matched_user_data = Account.objects.get(user=matched_user).__dict__
+        matched_user_data.pop("_state")
+        matched_user_data["age"] = str(
+            datetime.date.today().year - int(matched_user_data["birth_year"])
+        )
+
+        (
+            initial_songs,
+            initial_artists,
+            initial_albums,
+            initial_genres,
+            initial_prompts,
+            artist_art,
+            album_art,
+        ) = get_favorite_data(matched_user, spotify, True)
+
+        account = Account.objects.get(user=request.user)
+        matched_account = Account.objects.get(user=matched_user)
+        interested_events, going_to_events, past_events = getSavedEvents(matched_user)
+
+        matched_pks = [match["pk"] for match in matches_data]
+        history = chat_history(request, matched_pks)
+        context = {}
+        context.update({"chat_history": history})
+        context.update(initial_songs)
+        context.update(initial_artists)
+        context.update(initial_albums)
+        context.update(initial_genres)
+        context.update(initial_prompts)
+        context.update(artist_art)
+        context.update(album_art)
+        context.update({"user": user_data})
+        context.update({"matched_user": matched_user_data})
+        context.update({"matches_data": matches_data})
+        context.update({"profile_picture": account.profile_picture})
+        context.update({"matched_profile_picture": matched_account.profile_picture})
+        context.update({"interested_events": interested_events})
+        context.update({"going_to_events": going_to_events})
+        context.update({"past_events": past_events})
+        return render(request, "application/moderator_view.html", context)
+
+
 @login_required
+@moderator_no_access
 def match_profile(request, match_pk):
     spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
     curr_user = request.user
@@ -1053,7 +1145,7 @@ def match_profile(request, match_pk):
 
     account = Account.objects.get(user=curr_user)
     matched_account = Account.objects.get(user=matched_user)
-    interested_events, going_to_events = getSavedEvents(matched_user)
+    interested_events, going_to_events, past_events = getSavedEvents(matched_user)
 
     matched_pks = [match["pk"] for match in matches_data]
     history = chat_history(request, matched_pks)
@@ -1073,10 +1165,12 @@ def match_profile(request, match_pk):
     context.update({"matched_profile_picture": matched_account.profile_picture})
     context.update({"interested_events": interested_events})
     context.update({"going_to_events": going_to_events})
+    context.update({"past_events": past_events})
     return render(request, "application/match_profile.html", context)
 
 
 @login_required
+@moderator_no_access
 def remove_match(request, match_pk):
     user_likes = Likes.objects.get(user=request.user)
     user_likes.likes.remove(int(match_pk))
@@ -1101,20 +1195,24 @@ def getSavedEvents(user):
     goingToEvents = (
         [] if saved_events.goingToEvents is None else saved_events.goingToEvents
     )
-    interested_events = getEventList(
-        interestedEvents,
-    )
-    going_to_events = getEventList(goingToEvents)
 
-    return interested_events, going_to_events
+    interested_events = getEventList(interestedEvents, False)
+    going_to_events = getEventList(goingToEvents, False)
+    past_events = getEventList(goingToEvents, True)
+
+    return interested_events, going_to_events, past_events
 
 
-def getEventList(user_events):
+def getEventList(user_events, pastEvents):
     saved_events = []
     for event_id in user_events:
         event = EventList.objects.get(pk=event_id)
         if event.start_date < datetime.date.today():
-            continue
+            if pastEvents is False:
+                continue
+        else:
+            if pastEvents is True:
+                continue
         time_string = event.start_time
         if time_string == "TBA":
             event_time_final = "TBA"
@@ -1122,8 +1220,7 @@ def getEventList(user_events):
             # getting stripped standard time from datetime obj
             time_object = datetime.datetime.strptime(event.start_time, "%H:%M:%S")
             mil_time = time_object.time()
-            # std_time = mil_time.strftime("%-I:%M" "%p").lower()
-            std_time = mil_time.strftime("%M").lower()
+            std_time = mil_time.strftime("%I:%M %p").lstrip("0").lower()
             event_time_final = std_time
             this_event_date = datetime.datetime.strptime(
                 str(event.start_date), "%Y-%m-%d"
@@ -1143,3 +1240,25 @@ def getEventList(user_events):
             )
         )
     return saved_events
+
+
+def submit_report(request):
+    if request.method == "POST":
+        reported_by = request.user
+        report_message = request.POST["report_message"]
+        reported_profile = User.objects.get(id=request.POST["reported_profile_id"])
+
+        # if this same user reported this same profile already, don't add new report
+        if not Reports.objects.filter(
+            reported_by=reported_by, reported_profile=reported_profile
+        ).exists():
+            report = Reports(
+                reported_by=reported_by,
+                report_message=report_message,
+                reported_profile=reported_profile,
+            )
+            report.save()
+            print(report.reported_time)
+            return JsonResponse({"status": "Report Added"})
+        return JsonResponse({"status": "Duplicate Report"})
+    return JsonResponse({"status": "Report not added"})
