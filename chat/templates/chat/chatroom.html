@@ -250,6 +250,8 @@
       var options = { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
       var time = date.toLocaleString('en-US', options);
       var newMessage = $('<div class="message-box-left"><span class="message-content">'+message.content+'</span><span class="timestamp">'+time+'</span></div>');
+      var lineElement = $('<hr>');
+      $('.messages').append(lineElement);
       $('.messages').append(newMessage);
       $('.messages').scrollTop($('.messages')[0].scrollHeight);
       newMessage.addClass('highlight');
@@ -257,6 +259,7 @@
         newMessage.animate({backgroundColor: 'transparent'}, 3000, function() {
           console.log("\n\n\n Timeout time \n\n\n\n")
           newMessage.removeClass('highlight');
+          $('.messages').remove(lineElement);
         });
       }, 4000);
       

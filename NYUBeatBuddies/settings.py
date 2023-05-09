@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -29,7 +30,9 @@ load_dotenv(dotenv_path)
 SECRET_KEY = os.environ["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG_LOGS_CONFIG = os.environ.get("DEBUG_LOGS_CONFIG", "ON")
+DEBUG = DEBUG_LOGS_CONFIG != "OFF"
+print("\n\n\n\n\nDEBUG IS", DEBUG, "\n\n\n")
 
 ALLOWED_HOSTS = [
     "nbb-env.eba-qmhnyae3.us-west-2.elasticbeanstalk.com",

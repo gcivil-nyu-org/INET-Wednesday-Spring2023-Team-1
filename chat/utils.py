@@ -9,7 +9,7 @@ tz = timezone("EST")
 
 
 def getFormattedTime(timestamp):
-    today = datetime.date.today()
+    today = datetime.datetime.now(tz).date()
     yesterday = today - datetime.timedelta(days=1)
     if timestamp.date() == today:
         delta = datetime.datetime.now(tz) - timestamp

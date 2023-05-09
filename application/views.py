@@ -153,6 +153,11 @@ def get_favorite_data(curr_user, spotify="", get_pics=False):
             "response3": profile_prompts.response3,
             "response4": profile_prompts.response4,
             "response5": profile_prompts.response5,
+            "response1_id": profile_prompts.response1_id,
+            "response2_id": profile_prompts.response2_id,
+            "response3_id": profile_prompts.response3_id,
+            "response4_id": profile_prompts.response4_id,
+            "response5_id": profile_prompts.response5_id,
         }
     else:
         initial_prompts = {}

@@ -116,6 +116,11 @@ class UserPrompts(models.Model):
     response3 = models.CharField(max_length=300)
     response4 = models.CharField(max_length=300)
     response5 = models.CharField(max_length=300)
+    response1_id = models.CharField(max_length=300)
+    response2_id = models.CharField(max_length=300)
+    response3_id = models.CharField(max_length=300)
+    response4_id = models.CharField(max_length=300)
+    response5_id = models.CharField(max_length=300)
 
     def __str__(self):
         return f"{self.user.account.first_name} {self.user.account.last_name}"

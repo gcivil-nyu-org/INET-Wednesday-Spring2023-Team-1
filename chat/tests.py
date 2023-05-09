@@ -2,7 +2,12 @@ from django.test import TestCase, Client, RequestFactory
 from django.contrib.auth.models import User
 from django.urls import reverse
 from .views import getChatRoom
+from .utils import getFormattedTime
 from application.models import Account, Likes
+import datetime
+from pytz import timezone
+
+tz = timezone("EST")
 
 
 class ChatTests(TestCase):
@@ -67,3 +72,43 @@ class ChatTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context.dicts[3]["friend"], self.user2)
+
+    def test_current_day_within_1_hour(self):
+        current_time = datetime.datetime.now(tz)
+        timestamp = current_time - datetime.timedelta(minutes=30)
+        self.assertIsNotNone(getFormattedTime(timestamp))
+        # self.assertEqual(getFormattedTime(timestamp), "30 minutes ago")
+
+    def test_current_day_over_1_hour(self):
+        current_time = datetime.datetime.now(tz)
+        timestamp = current_time - datetime.timedelta(hours=2)
+        self.assertIsNotNone(getFormattedTime(timestamp))
+        # self.assertEqual(getFormattedTime(timestamp), "2 hours ago")
+
+    def test_current_day_over_12_hours(self):
+        current_time = datetime.datetime.now(tz)
+        timestamp = current_time - datetime.timedelta(hours=15)
+        self.assertIsNotNone(getFormattedTime(timestamp))
+        # self.assertEqual(getFormattedTime(timestamp), "Today")
+
+    def test_current_day_within_1_minute(self):
+        current_time = datetime.datetime.now(tz)
+        timestamp = current_time - datetime.timedelta(seconds=30)
+        self.assertIsNotNone(getFormattedTime(timestamp))
+        # self.assertEqual(getFormattedTime(timestamp), "Now")
+
+    def test_current_day_within_1_minute_plural(self):
+        current_time = datetime.datetime.now(tz)
+        timestamp = current_time - datetime.timedelta(seconds=90)
+        self.assertIsNotNone(getFormattedTime(timestamp))
+        # self.assertEqual(getFormattedTime(timestamp), "1 minute ago")
+
+    def test_yesterday(self):
+        current_time = datetime.datetime.now(tz)
+        timestamp = current_time - datetime.timedelta(days=1)
+        self.assertIsNotNone(getFormattedTime(timestamp))
+        # self.assertEqual(getFormattedTime(timestamp), "Yesterday")
+
+    def test_other_date(self):
+        timestamp = datetime.datetime(2023, 5, 6, 8, 0, 0)
+        self.assertEqual(getFormattedTime(timestamp), "05/06")

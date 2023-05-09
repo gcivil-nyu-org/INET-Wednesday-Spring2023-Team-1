@@ -399,6 +399,11 @@ def get_prompt_choices():
 
 
 class PromptEdit(ModelForm):
+    response1_id = forms.CharField(required=False)
+    response2_id = forms.CharField(required=False)
+    response3_id = forms.CharField(required=False)
+    response4_id = forms.CharField(required=False)
+    response5_id = forms.CharField(required=False)
     try:
         prompt_choices = get_prompt_choices()
         prompt1 = forms.ChoiceField(choices=prompt_choices)
@@ -496,6 +501,11 @@ class PromptEdit(ModelForm):
                 ),
                 css_class="form-row",
             ),
+            Field("response1_id", type="hidden"),
+            Field("response2_id", type="hidden"),
+            Field("response3_id", type="hidden"),
+            Field("response4_id", type="hidden"),
+            Field("response5_id", type="hidden"),
         )
         self.helper.form_show_labels = False
 
@@ -523,6 +533,11 @@ class PromptEdit(ModelForm):
             "response3",
             "response4",
             "response5",
+            "response1_id",
+            "response2_id",
+            "response3_id",
+            "response4_id",
+            "response5_id",
         )
 
 

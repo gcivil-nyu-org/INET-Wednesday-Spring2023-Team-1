@@ -327,28 +327,32 @@
       function saveResponseOnClick1(event, ui) {
         event.preventDefault();
         $("#id_response1").val(ui.item.label);
+        $("#id_response1_id").val(ui.item.value);
 
       };
 
       function saveResponseOnClick2(event, ui) {
         event.preventDefault();
         $("#id_response2").val(ui.item.label);
+        $("#id_response2_id").val(ui.item.value);
 
       };
       function saveResponseOnClick3(event, ui) {
         event.preventDefault();
         $("#id_response3").val(ui.item.label);
+        $("#id_response3_id").val(ui.item.value);
 
       };
       function saveResponseOnClick4(event, ui) {
         event.preventDefault();
         $("#id_response4").val(ui.item.label);
+        $("#id_response4_id").val(ui.item.value);
 
       };
       function saveResponseOnClick5(event, ui) {
         event.preventDefault();
         $("#id_response5").val(ui.item.label);
-
+        $("#id_response5_id").val(ui.item.value);
       };
 
       });

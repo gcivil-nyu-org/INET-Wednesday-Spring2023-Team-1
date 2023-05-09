@@ -1,6 +1,8 @@
 from django.test import TestCase, Client, RequestFactory
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.urls import reverse
+from django.contrib import admin
+from django.apps import apps
 from .models import (
     FavoriteGenre,
     FavoriteArtist,
@@ -11,9 +13,10 @@ from .models import (
     EventList,
     Likes,
     SavedEvents,
+    Reports,
 )
 import os
-from .views import discover_events, profile_edit, profile, discover
+from .views import discover_events, profile_edit, profile, discover, moderator_view
 import datetime
 
 # from bs4 import BeautifulSoup
@@ -578,3 +581,85 @@ class DiscoverEvents(TestCase):
             {"agoing": "agoing", "item": self.event2.pk},
         )
         self.assertEqual(response.status_code, 302)
+
+
+class AdminRegistrationTestCase(TestCase):
+    def test_register_models_for_application(self):
+        app_models = apps.get_app_config("application").get_models()
+        registered_models = admin.site._registry
+
+        for model in app_models:
+            self.assertIn(model, registered_models)
+
+    def test_register_models_for_account(self):
+        acct_models = apps.get_app_config("account").get_models()
+        registered_models = admin.site._registry
+
+        for model in acct_models:
+            self.assertIn(model, registered_models)
+
+    def test_register_models_for_chat(self):
+        chat_models = apps.get_app_config("chat").get_models()
+        registered_models = admin.site._registry
+
+        for model in chat_models:
+            self.assertIn(model, registered_models)
+
+
+class ModeratorGroupTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = Client()
+        cls.request_factory = RequestFactory()
+        cls.user1 = User.objects.create_user(username="TEST_USER", password="@1234567")
+        cls.user2 = User.objects.create_user(
+            username="TEST_USER_2", password="@1234567"
+        )
+        cls.user3 = User.objects.create_user(
+            username="TEST_USER_3", password="@1234567"
+        )
+        cls.Acct = Account.objects.create(
+            user=cls.user1,
+            first_name="moderator",
+            last_name="moderator",
+            birth_year=1950,
+            location="nowhere",
+            profile_picture="placeholder",
+        )
+        cls.Acct2 = Account.objects.create(
+            user=cls.user2,
+            first_name="John",
+            last_name="Doe",
+            birth_year=1996,
+            location="NYC",
+            profile_picture="placeholder",
+        )
+        cls.Acct3 = Account.objects.create(
+            user=cls.user3,
+            first_name="Jenna",
+            last_name="Doe",
+            birth_year=1997,
+            location="Miami",
+            profile_picture="placeholder",
+        )
+
+    def test_add_user_to_moderators_group(self):
+        moderators_group, created = Group.objects.get_or_create(name="Moderator")
+        self.assertFalse(moderators_group.user_set.filter(pk=self.user1.pk).exists())
+        moderators_group.user_set.add(self.user1)
+        self.assertTrue(moderators_group.user_set.filter(pk=self.user1.pk).exists())
+        Reports.objects.create(
+            reported_by=self.user2,
+            report_message="This is a report message.",
+            reported_profile=self.user3,
+        )
+        self.assertEquals(len(Reports.objects.all()), 1)
+        self.client.force_login(self.user1)
+        response = self.client.get(reverse("application:reports"))
+        self.assertEqual(response.status_code, 200)
+        request = self.request_factory.get(
+            reverse("application:moderator_view", kwargs={"user_pk": self.user2.pk})
+        )
+        request.user = self.user1
+        response = moderator_view(request, self.user2.pk)
+        self.assertEqual(response.status_code, 200)

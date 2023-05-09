@@ -484,27 +484,6 @@ a {
     margin-right: 4px;
 }
 
-.genre-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-}
-
-.genre-buttons button {
-    border: 1px solid #ccc;
-    border-radius: 15px;
-    padding: 5px 10px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    background-color: #f5f5f5;
-    font-size: 14px;
-}
-
-.genre-buttons button:hover {
-    background-color: #e5e5e5;
-    cursor: pointer;
-}
-
 .answer {
     width: 100%;
 }
@@ -582,6 +561,37 @@ a {
     padding: 5px;
     margin-right: 25px;
 }
+
+#favorite_genres {
+    text-align: center;
+  }
+
+fieldset {
+    width:100%;
+    height:200%;
+    vertical-align: middle;
+    text-align:center;
+    margin-bottom: 5px;
+}
+
+legend {
+    margin-left:5px;
+    margin-top: 10px;
+}
+
+#genre_button {
+    border: 1px solid #ccc;
+    border-radius: 30px;
+    padding: 5px 10px;
+    margin-right: 10px;
+    margin-top: 6px;
+    background-color: #f5f5f5;
+}
+
+fieldset #genre_button:hover {
+    background-color: #e5e5e5;
+    cursor: pointer;
+} 
 
 *::-webkit-scrollbar-thumb {
     background-color: #4a2555;
