@@ -31,6 +31,13 @@
                     EmbedController.togglePlay();
                   });
                 })
+            document.querySelectorAll('.response_box').forEach(
+                response_box => {
+                  response_box.addEventListener('click', () => {
+                    EmbedController.loadUri(response_box.dataset.spotifyId)
+                    EmbedController.togglePlay();
+                  });
+                });
             };
             IFrameAPI.createController(element, options, callback);
           };
@@ -169,19 +176,19 @@
                                 <h3>Top Songs</h3>
                                 <ul>
 
-                                <li class="click_song" data-spotify-id="spotify:track:{{song1_id}}" style="background-color: #cdb4db">
+                                <li class="click_song" id="discover_song1"  data-spotify-id="spotify:track:{{song1_id}}" style="background-color: #cdb4db">
                                     {{song1_name_artist}}
                                 </li>
-                                <li class="click_song" data-spotify-id="spotify:track:{{song2_id}}" style="background-color: #ffc8dd">
+                                <li class="click_song" id="discover_song2" data-spotify-id="spotify:track:{{song2_id}}" style="background-color: #ffc8dd">
                                     {{song2_name_artist}}
                                 </li>
-                                <li class="click_song" data-spotify-id="spotify:track:{{song3_id}}" style="background-color: #ffafcc">
+                                <li class="click_song" id="discover_song3" data-spotify-id="spotify:track:{{song3_id}}" style="background-color: #ffafcc">
                                     {{song3_name_artist}}
                                 </li>
-                                <li class="click_song" data-spotify-id="spotify:track:{{song4_id}}" style="background-color: #bde0fe">
+                                <li class="click_song" id="discover_song4" data-spotify-id="spotify:track:{{song4_id}}" style="background-color: #bde0fe">
                                     {{song4_name_artist}}
                                 </li>
-                                <li class="click_song" data-spotify-id="spotify:track:{{song5_id}}" style="background-color: #a2d2ff">
+                                <li class="click_song" id="discover_song5" data-spotify-id="spotify:track:{{song5_id}}" style="background-color: #a2d2ff">
                                     {{song5_name_artist}}
                                 </ul>
                             </div>
@@ -198,7 +205,7 @@
                                         <div>
                                             <h4 id="discover_prompt1">{{prompt1}}</h4>
                                             <div class="answer">
-                                                <div id="discover_response1" class="box">{{response1}}</div>
+                                                <div id="discover_response1" class="response_box" data-spotify-id="spotify:track:{{response1_id}}">{{response1}}</div>
                                             </div>
                                         </div>
                                     </li>
@@ -206,7 +213,7 @@
                                         <div>
                                             <h4 id="discover_prompt2">{{prompt2}}</h4>
                                             <div class="answer">
-                                                <div id="discover_response2" class="box">{{response2}}</div>
+                                                <div id="discover_response2" class="response_box" data-spotify-id="spotify:track:{{response2_id}}">{{response2}}</div>
                                             </div>
                                         </div>
                                     </li>
@@ -214,7 +221,7 @@
                                         <div>
                                             <h4 id="discover_prompt3">{{prompt3}}</h4>
                                             <div class="answer">
-                                                <div id="discover_response3" class="box">{{response3}}</div>
+                                                <div id="discover_response3" class="response_box" data-spotify-id="spotify:track:{{response3_id}}">{{response3}}</div>
                                             </div>
                                         </div>
                                     </li>
@@ -222,7 +229,7 @@
                                         <div>
                                             <h4 id="discover_prompt4">{{prompt4}}</h4>
                                             <div class="answer">
-                                                <div id="discover_response4" class="box">{{response4}}</div>
+                                                <div id="discover_response4" class="response_box" data-spotify-id="spotify:track:{{response1_id}}">{{response4}}</div>
                                             </div>
                                         </div>
                                     </li>
@@ -230,7 +237,7 @@
                                         <div>
                                             <h4 id="discover_prompt5">{{prompt5}}</h4>
                                             <div class="answer">
-                                                <div id="discover_response5" class="box">{{response5}}</div>
+                                                <div id="discover_response5" class="response_box" data-spotify-id="spotify:track:{{response5_id}}">{{response5}}</div>
                                             </div>
                                         </div>
                                     </li>
@@ -457,8 +464,6 @@
             </div>
 
 
-
-            </div>
             <div id="no-more-users" style="display:none;">
                 <div style="display: flex;justify-content: center;flex-direction: column;align-items: center;">
                     <p class="no_users_title" style="font-family:  'Franklin Gothic Medium', sans-serif; font-size: 30px; margin: 0;">No more potential matches</p>
@@ -573,12 +578,13 @@
         }
 
     </style>
+
     <script>
         $(document).ready(function () {
             $('.report-user').on('click', function () {
 
                 $('#report-user-popup').dialog({
-                    width: 325,
+                    width: 335,
                     height: 350,
                     modal: true,
                     resizable: false,
@@ -644,6 +650,11 @@
                         $('#discover_song3').html(response.discover_favorite_songs.song3_name_artist);
                         $('#discover_song4').html(response.discover_favorite_songs.song4_name_artist);
                         $('#discover_song5').html(response.discover_favorite_songs.song5_name_artist);
+                        $('#discover_song1').attr('data-spotify-id', 'spotify:track:' + response.discover_favorite_songs.song1_id);
+                        $('#discover_song2').attr('data-spotify-id', 'spotify:track:' + response.discover_favorite_songs.song2_id);
+                        $('#discover_song3').attr('data-spotify-id', 'spotify:track:' + response.discover_favorite_songs.song3_id);
+                        $('#discover_song4').attr('data-spotify-id', 'spotify:track:' + response.discover_favorite_songs.song4_id);
+                        $('#discover_song5').attr('data-spotify-id', 'spotify:track:' + response.discover_favorite_songs.song5_id);
                         $('#discover_prompt1').html(response.discover_prompts.prompt1);
                         $('#discover_prompt2').html(response.discover_prompts.prompt2);
                         $('#discover_prompt3').html(response.discover_prompts.prompt3);
@@ -654,6 +665,11 @@
                         $('#discover_response3').html(response.discover_prompts.response3);
                         $('#discover_response4').html(response.discover_prompts.response4);
                         $('#discover_response5').html(response.discover_prompts.response5);
+                        $('#discover_response1').attr('data-spotify-id', 'spotify:track:' + response.discover_prompts.response1_id);
+                        $('#discover_response2').attr('data-spotify-id', 'spotify:track:' + response.discover_prompts.response2_id);
+                        $('#discover_response3').attr('data-spotify-id', 'spotify:track:' + response.discover_prompts.response3_id);
+                        $('#discover_response4').attr('data-spotify-id', 'spotify:track:' + response.discover_prompts.response4_id);
+                        $('#discover_response5').attr('data-spotify-id', 'spotify:track:' + response.discover_prompts.response5_id);
                         $('#discover_genre1').html(response.discover_favorite_genres.genre1);
                         $('#discover_genre2').html(response.discover_favorite_genres.genre2);
                         $('#discover_genre3').html(response.discover_favorite_genres.genre3);
@@ -772,6 +788,11 @@
                         $('#discover_song3').html(response.discover_favorite_songs.song3_name_artist);
                         $('#discover_song4').html(response.discover_favorite_songs.song4_name_artist);
                         $('#discover_song5').html(response.discover_favorite_songs.song5_name_artist);
+                        $('#discover_song1').attr('data-spotify-id', 'spotify:track:' + response.discover_favorite_songs.song1_id);
+                        $('#discover_song2').attr('data-spotify-id', 'spotify:track:' + response.discover_favorite_songs.song2_id);
+                        $('#discover_song3').attr('data-spotify-id', 'spotify:track:' + response.discover_favorite_songs.song3_id);
+                        $('#discover_song4').attr('data-spotify-id', 'spotify:track:' + response.discover_favorite_songs.song4_id);
+                        $('#discover_song5').attr('data-spotify-id', 'spotify:track:' + response.discover_favorite_songs.song5_id);
                         $('#discover_prompt1').html(response.discover_prompts.prompt1);
                         $('#discover_prompt2').html(response.discover_prompts.prompt2);
                         $('#discover_prompt3').html(response.discover_prompts.prompt3);
@@ -782,6 +803,11 @@
                         $('#discover_response3').html(response.discover_prompts.response3);
                         $('#discover_response4').html(response.discover_prompts.response4);
                         $('#discover_response5').html(response.discover_prompts.response5);
+                        $('#discover_response1').attr('data-spotify-id', 'spotify:track:' + response.discover_prompts.response1_id);
+                        $('#discover_response2').attr('data-spotify-id', 'spotify:track:' + response.discover_prompts.response2_id);
+                        $('#discover_response3').attr('data-spotify-id', 'spotify:track:' + response.discover_prompts.response3_id);
+                        $('#discover_response4').attr('data-spotify-id', 'spotify:track:' + response.discover_prompts.response4_id);
+                        $('#discover_response5').attr('data-spotify-id', 'spotify:track:' + response.discover_prompts.response5_id);
                         $('#discover_genre1').html(response.discover_favorite_genres.genre1);
                         $('#discover_genre2').html(response.discover_favorite_genres.genre2);
                         $('#discover_genre3').html(response.discover_favorite_genres.genre3);

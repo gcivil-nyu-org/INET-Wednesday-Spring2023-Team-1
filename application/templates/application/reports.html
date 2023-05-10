@@ -183,19 +183,22 @@
             <p id="reportName">
               <span><b><a href="{% url 'application:moderator_view' user_pk=report.reported_profile_pk%}">{{ report.reported_profile.first_name }} {{ report.reported_profile.last_name }}</a></b> reported by <a href="{% url 'application:moderator_view' user_pk=report.reported_by_pk %}">{{ report.reported_by.first_name }} {{ report.reported_by.last_name }}</a><span id="report-content">{{report.content}}</span></span>
             </p>
-            <form method="POST">
-              {% csrf_token %} 
+            <form method="POST" action="{% url 'application:ban_user' %}">
+              {% csrf_token %}
+              <input type="hidden" name="reported_profile_pk" value="{{ report.reported_profile_pk }}">
+              <input type="hidden" name="report_pk" value="{{ report.report_pk }}">
               <button
                 name="blockUser"
                 id="blockUser"
                 class="button"
                 value="blockUser"
               >
-                &#8856; Block User
+                &#8856; Ban User
               </button>
               <button name="dismiss" id="dismiss" class="button" value="dismiss">
                 Dismiss
               </button>
+            </form>
             <br />
           </div>
           {% endfor %}

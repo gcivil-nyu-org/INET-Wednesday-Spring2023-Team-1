@@ -24,13 +24,20 @@
             };
 
             const callback = (EmbedController) => {
-              document.querySelectorAll('.click_song').forEach(
-                click_song => {
-                  click_song.addEventListener('click', () => {
-                    EmbedController.loadUri(click_song.dataset.spotifyId)
-                    EmbedController.togglePlay();
-                  });
-                })
+                document.querySelectorAll('.click_song').forEach(
+                    click_song => {
+                      click_song.addEventListener('click', () => {
+                        EmbedController.loadUri(click_song.dataset.spotifyId)
+                        EmbedController.togglePlay();
+                      });
+                    })
+                document.querySelectorAll('.response_box').forEach(
+                    response_box => {
+                      response_box.addEventListener('click', () => {
+                        EmbedController.loadUri(response_box.dataset.spotifyId)
+                        EmbedController.togglePlay();
+                      });
+                    });
             };
             IFrameAPI.createController(element, options, callback);
           };
@@ -196,7 +203,7 @@
                                         <div>
                                             <h4 id="discover_prompt1">{{prompt1}}</h4>
                                             <div class="answer">
-                                                <div id="discover_response1" class="box">{{response1}}</div>
+                                                <div id="discover_response1" class="response_box" data-spotify-id="spotify:track:{{response1_id}}">{{response1}}</div>
                                             </div>
                                         </div>
                                     </li>
@@ -204,7 +211,7 @@
                                         <div>
                                             <h4 id="discover_prompt2">{{prompt2}}</h4>
                                             <div class="answer">
-                                                <div id="discover_response2" class="box">{{response2}}</div>
+                                                <div id="discover_response2" class="response_box" data-spotify-id="spotify:track:{{response2_id}}">{{response2}}</div>
                                             </div>
                                         </div>
                                     </li>
@@ -212,7 +219,7 @@
                                         <div>
                                             <h4 id="discover_prompt3">{{prompt3}}</h4>
                                             <div class="answer">
-                                                <div id="discover_response3" class="box">{{response3}}</div>
+                                                <div id="discover_response3" class="response_box" data-spotify-id="spotify:track:{{response3_id}}">{{response3}}</div>
                                             </div>
                                         </div>
                                     </li>
@@ -220,7 +227,7 @@
                                         <div>
                                             <h4 id="discover_prompt4">{{prompt4}}</h4>
                                             <div class="answer">
-                                                <div id="discover_response4" class="box">{{response4}}</div>
+                                                <div id="discover_response4" class="response_box" data-spotify-id="spotify:track:{{response4_id}}">{{response4}}</div>
                                             </div>
                                         </div>
                                     </li>
@@ -228,7 +235,7 @@
                                         <div>
                                             <h4 id="discover_prompt5">{{prompt5}}</h4>
                                             <div class="answer">
-                                                <div id="discover_response5" class="box">{{response5}}</div>
+                                                <div id="discover_response5" class="response_box" data-spotify-id="spotify:track:{{response5_id}}">{{response5}}</div>
                                             </div>
                                         </div>
                                     </li>
@@ -415,5 +422,85 @@
                     </div>            
                 </div>          
             </div>
+            <div id="report-user-popup" style="display:none;">
+                <button class="close-report-user" style="background: none; border: none; position: absolute; top: 0; right: 0;">&times;</button>
+                <div style="display: flex;justify-content: center;flex-direction: column;align-items: center; position: relative;">
+                    
+                    <h3 class="report_user_title" style="font-family:  'Franklin Gothic Medium', sans-serif; font-size: 30px; margin: 0;">Report Profile</h3>
+                    <p class="report_user_sub" style="font-family:  'Franklin Gothic Medium', sans-serif; font-size: 17px; margin: 0;">
+                     Please add details regarding your report of this profile.</p>
+                    <div class="report-text-area">
+                        <textarea rows="5" cols="25" style="resize: none;"></textarea>
+                    </div>
+                    <button class="submit-report-button">Submit Report</button>
+                </div>
+            </div>
     </body>
+    <style>
+        .ui-dialog .ui-dialog-content {
+            position: relative;
+            border: 0;
+            background: none;
+            overflow: auto;
+            zoom: 1;
+            border: solid 5px rgb(91, 10, 60);
+        }
+
+        .ui-widget-content {
+            border: none;
+        }
+
+        .ui-dialog-buttonpane {
+            text-align: center;
+        }
+
+        .ui-dialog-titlebar {
+            display: none;
+        }
+
+        .ui-dialog-buttonset {
+            display: inline-block;
+            margin: 0 auto;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+            $('.report-user').on('click', function () {
+
+                $('#report-user-popup').dialog({
+                    width: 335,
+                    height: 350,
+                    modal: true,
+                    resizable: false,
+                    draggable: true,
+                });
+            });
+
+            $('.close-report-user').on('click', function () {
+                $('#report-user-popup').dialog('close');
+            });
+
+            $('.submit-report-button').on('click', function () {
+
+                $.ajax({
+                    url: '/application/submit_report',
+                    type: 'POST',
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        'report_message': $('.report-text-area textarea').val(),
+                        'reported_profile_id': {{matched_user.user_id}},
+                    },
+                    success: function (data) {
+                        if (data.status === 'Report Added') {
+                            console.log('Report successful');
+                        } else {
+                            console.log('Report failed.');
+                        }
+                        $('#report-user-popup').dialog('close');
+                    },
+                });
+            });
+
+        });
+    </script>
 </html>

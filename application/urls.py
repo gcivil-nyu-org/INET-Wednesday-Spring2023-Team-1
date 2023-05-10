@@ -16,4 +16,5 @@ urlpatterns = [
     ),
     path("reports", views.reports, name="reports"),
     path("submit_report", views.submit_report, name="submit_report"),
+    path("ban_user", views.ban_user, name="ban_user"),
 ]

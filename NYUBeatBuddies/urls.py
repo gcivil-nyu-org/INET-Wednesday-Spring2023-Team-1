@@ -30,6 +30,7 @@ urlpatterns = [
     path("chat/", include(("chat.urls", "chat"), namespace="chat")),
     path("", views.home, name="home"),
     path("", include("django.contrib.auth.urls")),
+    path("banned", views.banned, name="banned"),
 ]
 
 if settings.DEBUG:
